@@ -612,7 +612,7 @@ Image 1 is only a pose and composition reference. Ignore the identity, body, hea
 
 Take the character from Image 2 and place them into the exact same position, pose, and perspective as the character in Image 1. The user’s character must fully replace the template character, including head shape, body type, proportions, and hands, so it looks like they are naturally the one holding the mirror.
 
-Inside the mirror, show the same character, but as an uplifted and improved version of themselves — more confident, refined, and powerful. This is the same identity, not a different character.
+Inside the mirror, show the same character, as a more confident, powerful, elevated version of themselves. Same face, same identity — just enhanced presence.
 
 The entire final image should match the art style of the user’s image. Adapt the full scene (character, background, lighting) so everything looks consistent in that style.
 
@@ -624,8 +624,10 @@ Before finalizing, confirm that:
 - The same character appears both outside and inside the mirror
 - The reflection clearly looks like an improved version of the same character
 - The art style matches the user’s image across the entire scene
+- 
 
-If any of these are not true, correct the image before completing the task.`;
+If any of these are not true, correct the image before completing the task.
+`;
 
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`,
