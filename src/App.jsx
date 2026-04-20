@@ -1,860 +1,1052 @@
-/**
- * ============================================================
- * REMOTE SKILLS LEARNING HUB
- * "Learn to earn from the comfort of your home"
- *
- * Pages: Home | How Surveys Work | Get Started | Testimonials
- *
- * TO CUSTOMIZE:
- *  1. Search "YOUR_WHATSAPP_NUMBER" → replace with e.g. 2348012345678
- *  2. Search "YOUR_YOUTUBE_VIDEO_ID" → replace with your YouTube video ID
- *     (the part after ?v= in the YouTube URL)
- *  3. Replace placeholder text where marked with // EDIT:
- *  4. Replace ScreenshotSlot boxes with <img> tags when ready
- * ============================================================
- */
-
-import { useState, useEffect } from "react";
-
-// ─────────────────────────────────────────────────────────────
-// CONFIG — Edit these in one place, they apply everywhere
-// ─────────────────────────────────────────────────────────────
-const WA_NUMBER   = "YOUR_WHATSAPP_NUMBER"; // EDIT: e.g. 2348012345678
-const WA_MESSAGE  = encodeURIComponent("Hi, I'm interested in learning about online surveys. Please guide me."); // EDIT preset message
-const YT_VIDEO_ID = "YOUR_YOUTUBE_VIDEO_ID"; // EDIT: YouTube video ID (part after ?v=)
-const SITE_TAG    = "Learn to earn from the comfort of your home";
-
-const waLink = (msg = WA_MESSAGE) => `https://wa.me/${WA_NUMBER}?text=${msg}`;
-
-// ─────────────────────────────────────────────────────────────
-// GLOBAL STYLES
-// ─────────────────────────────────────────────────────────────
-const GlobalStyles = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:         #f9f8f5;
-      --surface:    #ffffff;
-      --border:     #e5e1d8;
-      --ink:        #1a1917;
-      --ink-muted:  #5c5750;
-      --ink-light:  #9b958f;
-      --green:      #2a6048;
-      --green-lt:   #d5ebe1;
-      --green-dk:   #1e4535;
-      --wa:         #25d366;
-      --wa-dk:      #1aab52;
-      --radius:     10px;
-      --shadow:     0 2px 14px rgba(0,0,0,0.07);
-      --shadow-md:  0 6px 28px rgba(0,0,0,0.11);
-      --max-w:      1040px;
-      --font-head:  'Lora', Georgia, serif;
-      --font-body:  'Outfit', system-ui, sans-serif;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--font-body);
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.65;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Layout */
-    .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
-    .sec  { padding: 4.5rem 0; }
-    .sec-sm { padding: 2.5rem 0; }
-
-    /* Typography */
-    h1, h2, h3 { font-family: var(--font-head); line-height: 1.2; color: var(--ink); }
-    h1 { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 700; }
-    h2 { font-size: clamp(1.4rem, 3vw, 2.1rem); font-weight: 600; }
-    h3 { font-size: 1.05rem; font-weight: 600; }
-    p  { color: var(--ink-muted); line-height: 1.75; font-size: 0.97rem; }
-
-    .tag {
-      display: inline-block;
-      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.13em;
-      text-transform: uppercase; color: var(--green);
-      margin-bottom: 0.6rem;
-    }
-
-    /* Cards */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      box-shadow: var(--shadow);
-      transition: transform 0.22s, box-shadow 0.22s;
-    }
-    .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-    .card-accent { border-top: 3px solid var(--green); }
-
-    /* Grids — desktop defaults */
-    .g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
-    .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
-      padding: 0.72rem 1.6rem; border-radius: var(--radius);
-      font-family: var(--font-body); font-size: 0.92rem; font-weight: 500;
-      cursor: pointer; border: none; text-decoration: none;
-      transition: all 0.2s; line-height: 1; white-space: nowrap;
-    }
-    .btn-green  { background: var(--green); color: #fff; }
-    .btn-green:hover  { background: var(--green-dk); transform: translateY(-1px); }
-    .btn-wa     { background: var(--wa); color: #fff; }
-    .btn-wa:hover     { background: var(--wa-dk); transform: translateY(-1px); }
-    .btn-ghost  { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
-    .btn-ghost:hover  { border-color: var(--green); color: var(--green); }
-    .btn-lg     { padding: 0.9rem 2rem; font-size: 1rem; }
-
-    /* Divider */
-    hr.div { border: none; border-top: 1px solid var(--border); }
-
-    /* ── NAVBAR ── */
-    .nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 300;
-      background: rgba(249,248,245,0.97);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* Desktop: brand left, links right, single row */
-    .nav-inner {
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px;
-    }
-    .nav-brand { display: flex; flex-direction: column; cursor: pointer; }
-    .nav-brand-name {
-      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
-      color: var(--ink); line-height: 1.2;
-    }
-    .nav-brand-name span { color: var(--green); }
-    .nav-brand-tag { font-size: 0.62rem; color: var(--ink-light); }
-
-    /* Desktop nav links */
-    .nav-menu { display: flex; align-items: center; gap: 0.1rem; }
-    .nav-btn {
-      padding: 0.38rem 0.85rem; border-radius: 7px;
-      font-size: 0.85rem; font-weight: 500; color: var(--ink-muted);
-      cursor: pointer; transition: all 0.18s;
-      border: none; background: none; font-family: var(--font-body);
-      white-space: nowrap;
-    }
-    .nav-btn:hover, .nav-btn.active { color: var(--green); background: var(--green-lt); }
-
-    /* Hamburger — hidden on desktop, shown on mobile */
-    .nav-ham {
-      display: none; background: none; border: none;
-      cursor: pointer; font-size: 1.4rem; color: var(--ink);
-      padding: 0.3rem; line-height: 1;
-    }
-
-    /* Mobile-only title row (brand full-width + hamburger) */
-    .nav-mobile-row {
-      display: none; /* hidden on desktop */
-      align-items: center; justify-content: space-between;
-      padding: 0.65rem 1.5rem;
-    }
-
-    /* Mobile drawer — nav links stacked */
-    .nav-drawer {
-      display: none; flex-direction: column; gap: 0.15rem;
-      padding: 0.5rem 1.5rem 1rem;
-      border-top: 1px solid var(--border);
-      background: var(--bg);
-    }
-    .nav-drawer.open { display: flex; }
-    .nav-drawer .nav-btn { text-align: left; padding: 0.6rem 0.85rem; font-size: 0.9rem; }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 7.5rem 0 4.5rem;
-      background: linear-gradient(155deg, #eef6f1 0%, var(--bg) 65%);
-      border-bottom: 1px solid var(--border);
-    }
-    .hero-grid { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: center; }
-    .hero h1 { margin-bottom: 0.9rem; }
-    .hero h1 em { font-style: italic; color: var(--green); }
-    .hero-sub { font-size: 1rem; margin-bottom: 1.8rem; }
-    .hero-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-
-    /* Hero side panel */
-    .hero-panel {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 1.6rem; box-shadow: var(--shadow-md);
-    }
-    .hero-panel-title {
-      font-family: var(--font-head); font-size: 0.95rem; font-weight: 600;
-      margin-bottom: 1rem; padding-bottom: 0.7rem;
-      border-bottom: 1px solid var(--border); color: var(--ink);
-    }
-    .check-item { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.8rem; }
-    .check-icon {
-      width: 20px; height: 20px; border-radius: 50%;
-      background: var(--green-lt); color: var(--green);
-      font-size: 0.65rem; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 0.15rem; font-weight: 700;
-    }
-    .check-text { font-size: 0.86rem; color: var(--ink-muted); line-height: 1.5; }
-    .check-text strong { color: var(--ink); }
-
-    /* ── PAGE HEADER ── */
-    .ph {
-      padding: 7rem 0 3rem;
-      background: linear-gradient(150deg, #eef6f1 0%, var(--bg) 70%);
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .ph h1 { margin-bottom: 0.6rem; }
-    .ph p { max-width: 520px; margin: 0 auto; }
-
-    /* ── MYTH CARDS ── */
-    .myth { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-    .myth-top    { background: #fef2f2; padding: 1rem 1.25rem; }
-    .myth-bottom { background: #f0fdf4; padding: 1rem 1.25rem; }
-    .myth-lbl { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
-    .myth-lbl.r { color: #dc2626; }
-    .myth-lbl.g { color: var(--green); }
-    .myth-top p  { font-size: 0.87rem; color: #7f1d1d; }
-    .myth-bottom p { font-size: 0.87rem; color: #14532d; }
-
-    /* ── VIDEO EMBED ── */
-    .video-wrap {
-      position: relative; padding-bottom: 56.25%; height: 0;
-      overflow: hidden; border-radius: var(--radius);
-      box-shadow: var(--shadow-md); background: #000;
-    }
-    .video-wrap iframe {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%; border: none;
-    }
-
-    /* ── SCREENSHOT PLACEHOLDER ── */
-    .ss-slot {
-      background: var(--surface); border: 2px dashed var(--border);
-      border-radius: var(--radius); padding: 2.5rem 1.5rem; text-align: center;
-    }
-    .ss-slot .ss-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-    .ss-slot .ss-lbl { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
-    .ss-slot .ss-hint { font-size: 0.76rem; margin-top: 0.3rem; color: var(--ink-light); }
-
-    /* ── TESTIMONIAL ── */
-    .tc {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow);
-    }
-    .tc-stars { color: #f59e0b; font-size: 0.85rem; margin-bottom: 0.6rem; }
-    .tc-quote { font-size: 0.88rem; color: var(--ink-muted); font-style: italic; margin-bottom: 0.9rem; line-height: 1.65; }
-    .tc-name  { font-weight: 600; font-size: 0.84rem; color: var(--ink); }
-    .tc-role  { font-size: 0.75rem; color: var(--ink-light); margin-top: 0.1rem; }
-
-    /* ── CTA BAND ── */
-    .cta-band {
-      background: var(--green); border-radius: var(--radius);
-      padding: 2.5rem 2rem; text-align: center;
-    }
-    .cta-band h2 { color: #fff; margin-bottom: 0.6rem; }
-    .cta-band p  { color: rgba(255,255,255,0.82); max-width: 400px; margin: 0 auto 1.5rem; font-size: 0.95rem; }
-
-    /* ── FOOTER ── */
-    footer { background: var(--ink); padding: 2.5rem 0 2rem; }
-    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; text-align: center; }
-    .f-brand { font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: #fff; }
-    .f-brand span { color: #86efac; }
-    .f-tag { font-size: 0.68rem; color: rgba(255,255,255,0.38); }
-    .f-links { display: flex; gap: 1.4rem; flex-wrap: wrap; justify-content: center; }
-    .f-link {
-      font-size: 0.8rem; color: rgba(255,255,255,0.42);
-      background: none; border: none; cursor: pointer;
-      font-family: var(--font-body); transition: color 0.2s;
-    }
-    .f-link:hover { color: #fff; }
-    .f-disc { font-size: 0.72rem; max-width: 500px; color: rgba(255,255,255,0.26); line-height: 1.6; }
-    .f-copy { font-size: 0.7rem; color: rgba(255,255,255,0.22); }
-
-    /* ── RESPONSIVE — Tablet ── */
-    @media (max-width: 860px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .hero { padding: 6.5rem 0 3.5rem; }
-      .g3 { grid-template-columns: repeat(2, 1fr); }
-      .g2 { grid-template-columns: 1fr; }
-    }
-
-    /* ── RESPONSIVE — Mobile ── */
-    @media (max-width: 640px) {
-      /* Desktop nav row hidden; mobile row shown instead */
-      .nav-inner   { display: none !important; }
-      .nav-mobile-row { display: flex !important; }
-      .nav-ham     { display: flex !important; align-items: center; }
-      /* Grids go single column */
-      .g3 { grid-template-columns: 1fr; }
-      .g2 { grid-template-columns: 1fr; }
-      .sec { padding: 3rem 0; }
-      .sec-sm { padding: 2rem 0; }
-      .hero { padding: 5.5rem 0 3rem; }
-      .ph { padding: 5.5rem 0 2.5rem; }
-      /* Ensure headings are always visible on mobile */
-      h1, h2, h3 { color: var(--ink) !important; display: block !important; visibility: visible !important; }
-    }
-  `}</style>
-);
-
-// ─────────────────────────────────────────────────────────────
-// REUSABLE COMPONENTS
-// ─────────────────────────────────────────────────────────────
-
-const WaBtn = ({ label = "Chat on WhatsApp", size = "", msg = WA_MESSAGE }) => (
-  <a className={`btn btn-wa ${size === "lg" ? "btn-lg" : ""}`}
-     href={waLink(msg)} target="_blank" rel="noopener noreferrer">
-    💬 {label}
-  </a>
-);
-
-const Sec = ({ children, id = "", sm = false }) => (
-  <section className={sm ? "sec-sm" : "sec"} id={id}>
-    <div className="wrap">{children}</div>
-  </section>
-);
-
-const ScreenshotSlot = ({ label, hint }) => (
-  <div className="ss-slot">
-    <div className="ss-icon">🖼️</div>
-    <div className="ss-lbl">{label}</div>
-    {hint && <p className="ss-hint">{hint}</p>}
-  </div>
-);
-
-const TestiCard = ({ name, role, quote, stars = 5 }) => (
-  <div className="tc">
-    <div className="tc-stars">{"★".repeat(stars)}{"☆".repeat(5 - stars)}</div>
-    <p className="tc-quote">"{quote}"</p>
-    <div className="tc-name">{name}</div>
-    <div className="tc-role">{role}</div>
-  </div>
-);
-
-// ─────────────────────────────────────────────────────────────
-// NAVBAR
-// ─────────────────────────────────────────────────────────────
-const Navbar = ({ page, go }) => {
-  const [open, setOpen] = useState(false);
-  const links = [
-    { id: "home",         label: "Home" },
-    { id: "how-it-works", label: "How It Works" },
-    { id: "testimonials", label: "Testimonials" },
-    { id: "get-started",  label: "Get Started" },
-  ];
-  const nav = (id) => { go(id); setOpen(false); };
-
-  const Brand = ({ onClick }) => (
-    <div className="nav-brand" onClick={onClick}>
-      <div className="nav-brand-name">Remote Skills <span>Learning Hub</span></div>
-      <div className="nav-brand-tag">{SITE_TAG}</div>
-    </div>
-  );
-
-  return (
-    <nav className="nav">
-      {/* ── Desktop row (hidden on mobile) ── */}
-      <div className="wrap">
-        <div className="nav-inner">
-          <Brand onClick={() => nav("home")} />
-          <div className="nav-menu">
-            {links.map(l => (
-              <button key={l.id}
-                className={`nav-btn ${page === l.id ? "active" : ""}`}
-                onClick={() => nav(l.id)}>{l.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile top row: title + hamburger (shown only on mobile) ── */}
-      <div className="nav-mobile-row">
-        <Brand onClick={() => nav("home")} />
-        <button className="nav-ham" onClick={() => setOpen(o => !o)} aria-label="Menu">
-          {open ? "✕" : "☰"}
-        </button>
-      </div>
-
-      {/* ── Mobile drawer: nav links only ── */}
-      <div className={`nav-drawer ${open ? "open" : ""}`}>
-        {links.map(l => (
-          <button key={l.id}
-            className={`nav-btn ${page === l.id ? "active" : ""}`}
-            onClick={() => nav(l.id)}>{l.label}
-          </button>
-        ))}
-      </div>
-    </nav>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
-// FOOTER
-// ─────────────────────────────────────────────────────────────
-const Footer = ({ go }) => (
-  <footer>
-    <div className="wrap">
-      <div className="footer-inner">
-        <div>
-          <div className="f-brand">Remote Skills <span>Learning Hub</span></div>
-          <div className="f-tag">{SITE_TAG}</div>
-        </div>
-        <div className="f-links">
-          <button className="f-link" onClick={() => go("home")}>Home</button>
-          <button className="f-link" onClick={() => go("how-it-works")}>How It Works</button>
-          <button className="f-link" onClick={() => go("testimonials")}>Testimonials</button>
-          <button className="f-link" onClick={() => go("get-started")}>Get Started</button>
-          {/* EDIT: Add real pages when ready */}
-        </div>
-        <p className="f-disc">
-          This website is for educational purposes. Earnings from online surveys vary by individual
-          and platform. We do not guarantee any specific income. Always read each platform's terms before participating.
-        </p>
-        <div className="f-copy">© {new Date().getFullYear()} Remote Skills Learning Hub. All rights reserved.</div>
-      </div>
-    </div>
-  </footer>
-);
-
-// ─────────────────────────────────────────────────────────────
-// PAGE: HOME
-// ─────────────────────────────────────────────────────────────
-const Home = ({ go }) => (
-  <>
-    <section className="hero">
-      <div className="wrap">
-        <div className="hero-grid">
-          <div>
-            {/* EDIT: Main headline */}
-            <h1>Start Earning Online<br/>with <em>Paid Surveys</em></h1>
-            {/* EDIT: Keep this short — 1–2 sentences */}
-            <p className="hero-sub">
-              Discover how online surveys work, what to realistically expect,
-              and how to get started the right way — with personal guidance.
-            </p>
-            <div className="hero-btns">
-              <button className="btn btn-green" onClick={() => go("how-it-works")}>
-                See How It Works →
-              </button>
-              <WaBtn label="Get Access Now" size="lg" />
-            </div>
-          </div>
-
-          {/* EDIT: Checklist items on the right panel */}
-          <div className="hero-panel">
-            <div className="hero-panel-title">✅ What you'll get</div>
-            {[
-              ["A clear understanding", "of how online surveys actually work"],
-              ["Proof it works",        "real results, not empty promises"],
-              ["Step-by-step access",   "to the right platforms and tools"],
-              ["Personal guidance",     "via WhatsApp at your own pace"],
-            ].map(([bold, rest], i) => (
-              <div className="check-item" key={i}>
-                <div className="check-icon">✓</div>
-                <div className="check-text"><strong>{bold}</strong> {rest}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-
-    {/* SHORT INTRO */}
-    <Sec>
-      <div style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto" }}>
-        <span className="tag">What This Is</span>
-        <h2 style={{ marginBottom: "0.9rem" }}>A real opportunity, explained honestly</h2>
-        {/* EDIT: 2–3 sentence intro */}
-        <p>
-          Online surveys are one of the simplest ways to earn from your phone or computer.
-          This site explains how they work, shows you real proof, and connects you with
-          someone who will guide you through the process personally.
-        </p>
-      </div>
-    </Sec>
-
-    <hr className="div" />
-
-    {/* 3 NAVIGATION CARDS */}
-    <Sec>
-      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <span className="tag">Explore</span>
-        <h2>Where do you want to start?</h2>
-      </div>
-      <div className="g3">
-        {[
-          {
-            icon: "📊", title: "How It Works",
-            desc: "Understand surveys, how platforms pay, and what's realistic — honestly explained.", // EDIT
-            btn: <button className="btn btn-ghost" onClick={() => go("how-it-works")}>Learn More →</button>
-          },
-          {
-            icon: "⭐", title: "See Proof",
-            desc: "Real results from real people. No fabricated claims — just honest evidence.", // EDIT
-            btn: <button className="btn btn-ghost" onClick={() => go("testimonials")}>View Proof →</button>
-          },
-          {
-            icon: "💬", title: "Get Started",
-            desc: "Ready to begin? Get personal, step-by-step guidance directly on WhatsApp.", // EDIT
-            btn: <WaBtn label="Chat on WhatsApp" />
-          },
-        ].map((c, i) => (
-          <div className="card card-accent" key={i}>
-            <div style={{ fontSize: "1.5rem", marginBottom: "0.55rem" }}>{c.icon}</div>
-            <h3 style={{ marginBottom: "0.4rem" }}>{c.title}</h3>
-            <p style={{ fontSize: "0.87rem", marginBottom: "1.1rem" }}>{c.desc}</p>
-            {c.btn}
-          </div>
-        ))}
-      </div>
-    </Sec>
-
-    {/* TESTIMONIAL PREVIEW */}
-    <hr className="div" />
-    <Sec>
-      <div style={{ textAlign: "center", marginBottom: "1.75rem" }}>
-        <span className="tag">Results</span>
-        <h2>People are already doing this</h2>
-      </div>
-      {/* REPLACE WITH REAL TESTIMONIALS */}
-      <div className="g3">
-        {[
-          { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. Short and specific works best.", stars: 5 },
-          { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. Mention what changed for this person.", stars: 5 },
-          { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. Authentic feedback builds more trust.", stars: 4 },
-        ].map((t, i) => <TestiCard key={i} {...t} />)}
-      </div>
-      <div style={{ textAlign: "center", marginTop: "1.75rem" }}>
-        <button className="btn btn-ghost" onClick={() => go("testimonials")}>Read all testimonials →</button>
-      </div>
-    </Sec>
-
-    {/* BOTTOM CTA */}
-    <Sec sm>
-      <div className="cta-band">
-        {/* EDIT: CTA headline and subtext */}
-        <h2>Ready to get started?</h2>
-        <p>Send a message on WhatsApp and we'll walk you through everything personally.</p>
-        <WaBtn label="Message Us on WhatsApp" size="lg" />
-      </div>
-    </Sec>
-  </>
-);
-
-// ─────────────────────────────────────────────────────────────
-// PAGE: HOW IT WORKS
-// ─────────────────────────────────────────────────────────────
-const HowItWorks = ({ go }) => (
-  <>
-    <div className="ph">
-      <div className="wrap">
-        <span className="tag">Education</span>
-        <h1>How Online Surveys Work</h1>
-        <p>A clear, honest overview — no hype, no exaggerated promises.</p>
-      </div>
-    </div>
-
-    {/* VIDEO */}
-    <Sec id="video">
-      <div style={{ textAlign: "center", marginBottom: "1.75rem" }}>
-        <span className="tag">Watch First</span>
-        {/* EDIT: Video section title */}
-        <h2>See it explained in this video</h2>
-        {/* EDIT: Short description of the video */}
-        <p style={{ maxWidth: "480px", margin: "0.5rem auto 0" }}>
-          This short video walks you through how survey platforms work and what to expect.
-        </p>
-      </div>
-      <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-        {/* YOUTUBE VIDEO — set YT_VIDEO_ID in config at top of file */}
-        <div className="video-wrap">
-          <iframe
-            src={`https://www.youtube.com/embed/${YT_VIDEO_ID}`}
-            title="How Online Surveys Work"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      </div>
-    </Sec>
-
-    <hr className="div" />
-
-    {/* WHAT ARE SURVEYS */}
-    <Sec id="what">
-      <span className="tag">Section 1</span>
-      <h2 style={{ marginBottom: "0.9rem" }}>What are online surveys?</h2>
-      {/* EDIT: Your own explanation — 2–3 paragraphs */}
-      <p style={{ maxWidth: "680px", marginBottom: "1rem" }}>
-        Companies and research firms pay to collect opinions from real people. Instead of hiring
-        market researchers, they use survey platforms to reach regular users who share their
-        thoughts on products, services, and everyday habits.
-      </p>
-      <p style={{ maxWidth: "680px", marginBottom: "2rem" }}>
-        As a participant, you sign up on these platforms, complete surveys that match your profile,
-        and earn rewards — usually points that convert to cash, gift cards, or mobile money.
-      </p>
-      {/* PLACE SCREENSHOT OF SURVEY PLATFORM DASHBOARD HERE */}
-      <ScreenshotSlot
-        label="PLACE SCREENSHOT OF SURVEY PLATFORM DASHBOARD HERE"
-        hint="e.g. a screenshot showing the survey list or earnings dashboard"
-      />
-    </Sec>
-
-    <hr className="div" />
-
-    {/* HOW PAYMENT WORKS */}
-    <Sec id="payment">
-      <span className="tag">Section 2</span>
-      <h2 style={{ marginBottom: "0.9rem" }}>How do platforms pay you?</h2>
-      {/* EDIT: Your own explanation */}
-      <p style={{ maxWidth: "680px", marginBottom: "1.5rem" }}>
-        Most platforms use a points system. Every completed survey adds points to your account,
-        which you redeem for PayPal, bank transfer, or mobile money once you hit the minimum
-        withdrawal threshold. Payment timelines vary — typically 3 to 14 days after a request.
-      </p>
-      <div className="g3">
-        {/* EDIT: These 3 cards */}
-        {[
-          { icon: "⭐", title: "Points System",      body: "Earn points per survey. Redeem when you hit the minimum payout amount." },
-          { icon: "💳", title: "Cash Withdrawals",   body: "Most platforms support PayPal, bank transfer, or mobile money." },
-          { icon: "⏱️", title: "Realistic Timelines", body: "Consistent daily effort matters more than speed. Set realistic expectations." },
-        ].map((c, i) => (
-          <div className="card" key={i}>
-            <div style={{ fontSize: "1.4rem", marginBottom: "0.5rem" }}>{c.icon}</div>
-            <h3 style={{ marginBottom: "0.4rem" }}>{c.title}</h3>
-            <p style={{ fontSize: "0.87rem" }}>{c.body}</p>
-          </div>
-        ))}
-      </div>
-    </Sec>
-
-    <hr className="div" />
-
-    {/* MYTHS VS REALITY */}
-    <Sec id="myths">
-      <span className="tag">Section 3</span>
-      <h2 style={{ marginBottom: "0.8rem" }}>Common myths — and the truth</h2>
-      <p style={{ maxWidth: "580px", marginBottom: "2rem" }}>
-        There's a lot of misinformation online. Here is an honest look at what surveys can and cannot do.
-      </p>
-      {/* EDIT: Myths and realities below */}
-      <div className="g3">
-        {[
-          {
-            myth: "You can replace a full-time income with surveys alone.",
-            real: "Surveys work best as a side income. Results depend on consistency and platform choice."
-          },
-          {
-            myth: "All survey websites are scams.",
-            real: "Many are legitimate. The key is knowing which platforms are trustworthy — that's what the guide covers."
-          },
-          {
-            myth: "You get paid for every survey you start.",
-            real: "Platforms screen participants. You earn only when you qualify and complete a full survey."
-          },
-        ].map((m, i) => (
-          <div className="myth" key={i}>
-            <div className="myth-top"><div className="myth-lbl r">✗ Myth</div><p>{m.myth}</p></div>
-            <div className="myth-bottom"><div className="myth-lbl g">✓ Reality</div><p>{m.real}</p></div>
-          </div>
-        ))}
-      </div>
-    </Sec>
-
-    {/* NEXT CTA */}
-    <Sec sm>
-      <div className="cta-band">
-        <h2>Want to get started?</h2>
-        <p>Read our short guide, then reach out directly on WhatsApp for personal support.</p>
-        <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
-          <button className="btn btn-green btn-lg" onClick={() => go("get-started")}>How to Get Started →</button>
-          <WaBtn label="Get Access Now" size="lg" />
-        </div>
-      </div>
-    </Sec>
-  </>
-);
-
-// ─────────────────────────────────────────────────────────────
-// PAGE: GET STARTED
-// ─────────────────────────────────────────────────────────────
-const GetStarted = () => (
-  <>
-    <div className="ph">
-      <div className="wrap">
-        <span className="tag">Get Started</span>
-        <h1>How to Get Started</h1>
-        <p>Everything you need to know before your first survey — in plain language.</p>
-      </div>
-    </div>
-
-    <Sec>
-      {/* EDIT: 2–3 paragraphs ONLY. This is a funnel — keep it focused. */}
-      <div style={{ maxWidth: "660px", margin: "0 auto" }}>
-        <p style={{ marginBottom: "1.25rem", fontSize: "1rem" }}>
-          {/* EDIT: Paragraph 1 */}
-          Getting started with online surveys doesn't require any technical skills or upfront investment.
-          All you need is a smartphone or computer, an email address, and the willingness to be consistent.
-          The biggest mistake beginners make is joining random platforms without guidance — which leads to
-          wasted time and very little to show for it.
-        </p>
-        <p style={{ marginBottom: "1.25rem", fontSize: "1rem" }}>
-          {/* EDIT: Paragraph 2 */}
-          That's exactly why this guide exists. Instead of figuring it out alone, you get direct access
-          to platforms that actually pay, a clear setup process, and someone available on WhatsApp to
-          answer your questions in real time.
-        </p>
-        <p style={{ fontSize: "1rem" }}>
-          {/* EDIT: Paragraph 3 — optional, delete if not needed */}
-          If you're ready to take that first step, tap the button below. You'll be connected directly
-          and walked through everything at your own pace — no pressure, no rush.
-        </p>
-      </div>
-
-      {/* PLACE SCREENSHOT OF SURVEY WEBSITE HERE */}
-      <div style={{ maxWidth: "660px", margin: "2.5rem auto 0" }}>
-        <ScreenshotSlot
-          label="PLACE SCREENSHOT OF SURVEY WEBSITE HERE"
-          hint="e.g. homepage or sign-up page of the recommended platform"
-        />
-      </div>
-    </Sec>
-
-    {/* WHATSAPP CTA — the only real action on this page */}
-    <Sec sm>
-      <div className="cta-band" style={{ maxWidth: "580px", margin: "0 auto" }}>
-        <h2>Ready? Let's talk.</h2>
-        {/* EDIT: Adjust this message to match your style */}
-        <p>
-          Send a message on WhatsApp and get personal, step-by-step guidance to begin.
-          Response time is usually within a few hours.
-        </p>
-        {/* Preset WhatsApp message for this page */}
-        <WaBtn
-          label="Start on WhatsApp"
-          size="lg"
-          msg={encodeURIComponent("Hi! I've read through the site and I'm ready to get started with online surveys. Please guide me.")}
-        />
-      </div>
-    </Sec>
-  </>
-);
-
-// ─────────────────────────────────────────────────────────────
-// PAGE: TESTIMONIALS
-// ─────────────────────────────────────────────────────────────
-
-// EDIT: Replace ALL placeholder data with real testimonials before publishing
-const TESTIS = [
-  { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. Specific and genuine works better than vague praise.", stars: 5 },
-  { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. Mention the platform used or how long it took.", stars: 5 },
-  { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. A mix of honest reviews builds more trust.", stars: 4 },
-  { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. What changed for this person after getting the guide?", stars: 5 },
-  { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. Short and authentic is better than long and vague.", stars: 5 },
-  { name: "[Name]", role: "[Location]", quote: "Replace with a real testimonial. What were they struggling with before?", stars: 4 },
-];
-
-const Testimonials = () => (
-  <>
-    <div className="ph">
-      <div className="wrap">
-        <span className="tag">Proof</span>
-        {/* EDIT: Page title */}
-        <h1>What People Are Saying</h1>
-        {/* EDIT: Short page description */}
-        <p>Real feedback from people who followed the guide and got started.</p>
-      </div>
-    </div>
-
-    {/* TESTIMONIAL CARDS — REPLACE WITH REAL TESTIMONIALS */}
-    <Sec>
-      <div className="g3">
-        {TESTIS.map((t, i) => <TestiCard key={i} {...t} />)}
-      </div>
-    </Sec>
-
-    <hr className="div" />
-
-    {/* PAYMENT PROOF SCREENSHOTS */}
-    <Sec id="proof">
-      <div style={{ textAlign: "center", marginBottom: "1.75rem" }}>
-        <span className="tag">Payment Proof</span>
-        {/* EDIT: Proof section title */}
-        <h2>Proof of earnings</h2>
-        {/* EDIT: Short intro text */}
-        <p style={{ maxWidth: "460px", margin: "0.5rem auto 0" }}>
-          Real screenshots showing successful payouts. Replace the boxes below with your own images.
-        </p>
-      </div>
-      <div className="g3">
-        {/* PLACE PAYMENT PROOF SCREENSHOT HERE */}
-        <ScreenshotSlot label="PAYMENT PROOF SCREENSHOT" hint="e.g. payment confirmation email or app notification" />
-        {/* PLACE WITHDRAWAL PROOF SCREENSHOT HERE */}
-        <ScreenshotSlot label="WITHDRAWAL PROOF SCREENSHOT" hint="e.g. bank alert or mobile money receipt" />
-        {/* OPTIONAL 3RD PROOF SCREENSHOT */}
-        <ScreenshotSlot label="ADDITIONAL PROOF (OPTIONAL)" hint="e.g. earnings dashboard or account balance" />
-      </div>
-    </Sec>
-
-    {/* BOTTOM CTA */}
-    <Sec sm>
-      <div className="cta-band">
-        <h2>Convinced? Let's get you started.</h2>
-        {/* EDIT: CTA text */}
-        <p>Reach out on WhatsApp and we'll guide you through the process personally.</p>
-        <WaBtn label="Get Access on WhatsApp" size="lg" />
-      </div>
-    </Sec>
-  </>
-);
-
-// ─────────────────────────────────────────────────────────────
-// SCROLL TO TOP ON PAGE CHANGE
-// ─────────────────────────────────────────────────────────────
-const useScrollTop = (page) => {
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [page]);
-};
-
-// ─────────────────────────────────────────────────────────────
-// APP ROOT
-// ─────────────────────────────────────────────────────────────
+import { useState, useRef, useEffect } from 'react';
+
+// ─── UPDATE THESE ─────────────────────────────────────────────────────────────
+const CA = "PASTE_YOUR_CA_HERE";
+const TWITTER = "https://x.com/your_me_handle";
+const COMMUNITY = "https://x.com/i/communities/your_community_id";
+const GEMINI_KEY = import.meta.env?.VITE_APP_GEMINI || '';
+
+// ─── CSS ──────────────────────────────────────────────────────────────────────
+const css = `
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Syne+Mono&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,700;1,9..144,300;1,9..144,400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f3ed;
+  --ink: #111010;
+  --red: #d63a2f;
+  --warm: #e8e0d4;
+  --warmer: #ddd4c4;
+  --text: #1a1814;
+  --muted: #7a7068;
+  --border: rgba(17,16,16,0.12);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--ink); color: var(--bg); }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--ink); }
+
+/* ── CURSOR DOT ── */
+.cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--red);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s;
+  mix-blend-mode: multiply;
+}
+.cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s;
+  opacity: 0.35;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  background: rgba(247,243,237,0.88);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.nav-logo span { color: var(--red); }
+.nav-links { display: flex; align-items: center; gap: 6px; }
+.nav-link {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 100px;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'Syne', sans-serif;
+}
+.nav-link:hover { color: var(--ink); background: var(--warm); }
+.nav-link.cta {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 9px 20px;
+}
+.nav-link.cta:hover { background: #2a2824; }
+@media(max-width: 600px) {
+  nav { padding: 0 20px; }
+  .nav-hide { display: none; }
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 48px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-noise {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; opacity: 0.6;
+}
+
+/* floating soft orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  animation: orbFloat 12s ease-in-out infinite;
+}
+.orb1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(214,58,47,0.12), transparent 70%); top: -100px; right: -100px; animation-delay: 0s; }
+.orb2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(17,16,16,0.07), transparent 70%); bottom: 0; left: -80px; animation-delay: -5s; }
+.orb3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(214,58,47,0.08), transparent 70%); top: 40%; left: 10%; animation-delay: -2s; }
+@keyframes orbFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(20px,-30px) scale(1.05); }
+  66% { transform: translate(-15px,20px) scale(0.95); }
+}
+
+.hero-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: riseIn 0.8s 0.1s ease-out forwards;
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  display: block;
+  width: 32px; height: 1px;
+  background: var(--red);
+  opacity: 0.5;
+}
+
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(80px, 16vw, 200px);
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: riseIn 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
+  position: relative; z-index: 2;
+}
+.hero-title .em {
+  font-style: italic;
+  color: var(--red);
+  position: relative;
+  display: inline-block;
+}
+.hero-title .em::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 0; right: 0;
+  height: 3px;
+  background: var(--red);
+  opacity: 0.3;
+  border-radius: 2px;
+}
+
+.hero-sub {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(18px, 3vw, 28px);
+  color: var(--muted);
+  max-width: 500px;
+  line-height: 1.65;
+  margin-bottom: 44px;
+  opacity: 0;
+  animation: riseIn 0.8s 0.35s ease-out forwards;
+}
+
+.hero-actions {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  justify-content: center;
+  margin-bottom: 52px;
+  opacity: 0;
+  animation: riseIn 0.8s 0.5s ease-out forwards;
+}
+
+.btn-primary {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  font-family: 'Syne', sans-serif;
+}
+.btn-primary:hover {
+  background: #2a2824;
+  transform: scale(1.03) translateY(-1px);
+  box-shadow: 0 12px 32px rgba(17,16,16,0.25);
+}
+
+.btn-ghost {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid rgba(17,16,16,0.2);
+  border-radius: 100px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+  font-family: 'Syne', sans-serif;
+}
+.btn-ghost:hover { border-color: var(--ink); background: var(--warm); }
+
+/* CA pill */
+.ca-pill {
+  display: inline-flex; align-items: center; gap: 14px;
+  background: var(--warm);
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  padding: 12px 20px;
+  cursor: pointer;
+  max-width: 100%;
+  transition: all 0.2s;
+  opacity: 0;
+  animation: riseIn 0.8s 0.65s ease-out forwards;
+}
+.ca-pill:hover { background: var(--warmer); border-color: rgba(17,16,16,0.22); }
+.ca-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+  flex-shrink: 0;
+}
+.ca-addr {
+  font-family: 'Syne Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  max-width: 340px;
+}
+.ca-act {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.ca-pill:hover .ca-act { color: var(--red); }
+
+/* ── MARQUEE ── */
+.ticker {
+  overflow: hidden;
+  background: var(--ink);
+  padding: 14px 0;
+  position: relative;
+}
+.ticker-inner {
+  display: flex;
+  gap: 0;
+  animation: ticker 24s linear infinite;
+  white-space: nowrap;
+}
+.ticker-item {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  color: rgba(247,243,237,0.6);
+  padding: 0 28px;
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 20px;
+}
+.ticker-item.hl { color: var(--bg); }
+.ticker-sep {
+  width: 4px; height: 4px;
+  background: var(--red);
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ── WHY SECTION ── */
+.why {
+  padding: 100px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 56px;
+  display: flex; align-items: center; gap: 16px;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.why-intro {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 300;
+  line-height: 1.3;
+  color: var(--ink);
+  margin-bottom: 72px;
+  max-width: 680px;
+}
+.why-intro em { font-style: italic; color: var(--red); }
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin-bottom: 72px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+@media(max-width: 700px) { .why-grid { grid-template-columns: 1fr; } }
+
+.why-card {
+  background: var(--bg);
+  padding: 36px 32px;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.why-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.why-card:hover { background: var(--warm); }
+.why-card:hover::after { transform: scaleX(1); }
+.why-n {
+  font-family: 'Fraunces', serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(17,16,16,0.18);
+  margin-bottom: 20px;
+  letter-spacing: 0.08em;
+}
+.why-h {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 14px;
+  line-height: 1.3;
+}
+.why-p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.manifesto-card {
+  border-radius: 20px;
+  background: var(--ink);
+  padding: 52px 56px;
+  position: relative;
+  overflow: hidden;
+}
+.manifesto-card::before {
+  content: '"';
+  position: absolute;
+  top: -24px; left: 36px;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 180px;
+  color: rgba(247,243,237,0.06);
+  line-height: 1;
+  pointer-events: none;
+}
+.manifesto-card p {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: clamp(16px, 2.2vw, 22px);
+  line-height: 1.85;
+  color: rgba(247,243,237,0.6);
+  margin-bottom: 16px;
+  position: relative; z-index: 1;
+}
+.manifesto-card p:last-child {
+  color: var(--bg);
+  font-size: clamp(18px, 2.5vw, 26px);
+  margin-bottom: 0;
+}
+
+/* ── PFP SECTION ── */
+.pfp-wrap {
+  background: var(--ink);
+  padding: 100px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.pfp-wrap::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.pfp-inner { max-width: 1000px; margin: 0 auto; position: relative; z-index: 1; }
+
+.pfp-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 40px;
+  display: flex; align-items: center; gap: 16px;
+}
+.pfp-section-label::after { content:''; flex:1; height:1px; background:rgba(247,243,237,0.1); }
+
+.pfp-headline {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bg);
+  line-height: 1.1;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.pfp-headline span { color: var(--red); }
+
+.pfp-desc {
+  font-size: 13px;
+  color: rgba(247,243,237,0.45);
+  margin-bottom: 56px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Upload/result layout */
+.forge-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media(max-width: 640px) { .forge-layout { grid-template-columns: 1fr; } }
+
+.forge-panel { display: flex; flex-direction: column; gap: 14px; }
+
+.panel-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(247,243,237,0.35);
+  display: flex; align-items: center; gap: 10px;
+}
+.panel-tag-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(247,243,237,0.08);
+  border: 1px solid rgba(247,243,237,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  color: var(--red);
+}
+
+/* Upload zone */
+.drop-zone {
+  aspect-ratio: 1;
+  border: 1.5px solid rgba(247,243,237,0.1);
+  border-radius: 16px;
+  background: rgba(247,243,237,0.03);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  position: relative;
+}
+.drop-zone:hover { border-color: rgba(247,243,237,0.25); background: rgba(247,243,237,0.06); }
+.drop-zone.filled { border-color: rgba(247,243,237,0.2); }
+.drop-zone img { width:100%; height:100%; object-fit:cover; display:block; border-radius: 14px; }
+
+.drop-placeholder { text-align:center; padding:28px; }
+.drop-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: rgba(247,243,237,0.07);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 22px;
+}
+.drop-label {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: rgba(247,243,237,0.4);
+  margin-bottom: 6px;
+}
+.drop-sub {
+  font-family: 'Syne Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(247,243,237,0.2);
+}
+
+/* result zone */
+.result-zone {
+  aspect-ratio: 1;
+  border: 1.5px solid rgba(247,243,237,0.1);
+  border-radius: 16px;
+  background: rgba(247,243,237,0.03);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.3s;
+}
+.result-zone.has-result { border-color: rgba(214,58,47,0.4); }
+.result-zone img { width:100%; height:100%; object-fit:cover; display:block; border-radius: 14px; }
+
+.result-empty { text-align:center; padding:28px; }
+.result-empty-big {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 64px;
+  font-weight: 300;
+  color: rgba(247,243,237,0.06);
+  line-height: 1;
+  margin-bottom: 12px;
+  letter-spacing: -0.03em;
+}
+.result-empty-hint {
+  font-family: 'Syne Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(247,243,237,0.18);
+}
+
+/* forging state */
+.forging-state { text-align:center; padding:28px; }
+.forge-spinner {
+  width: 48px; height: 48px;
+  border: 2px solid rgba(247,243,237,0.1);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 18px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.forge-status {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: rgba(247,243,237,0.45);
+  margin-bottom: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+.forge-pct {
+  font-family: 'Syne Mono', monospace;
+  font-size: 11px;
+  color: rgba(247,243,237,0.22);
+  letter-spacing: 0.08em;
+}
+
+/* progress line */
+.prog-track {
+  height: 2px;
+  background: rgba(247,243,237,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* Forge + dl buttons */
+.forge-cta-wrap { margin-top: 32px; display: flex; flex-direction: column; gap: 10px; }
+
+.forge-btn {
+  width: 100%;
+  padding: 18px 32px;
+  background: var(--bg);
+  color: var(--ink);
+  border: none;
+  border-radius: 14px;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.forge-btn:hover:not(:disabled) {
+  background: #fff;
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+}
+.forge-btn:active:not(:disabled) { transform: scale(0.99); }
+.forge-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.dl-btn {
+  width: 100%;
+  padding: 14px 28px;
+  background: transparent;
+  color: var(--bg);
+  border: 1.5px solid rgba(247,243,237,0.2);
+  border-radius: 14px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.dl-btn:hover { background: rgba(247,243,237,0.07); border-color: rgba(247,243,237,0.4); }
+
+.share-hint {
+  text-align: center;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(247,243,237,0.3);
+  margin-top: 4px;
+}
+
+/* err */
+.err-pill {
+  padding: 12px 18px;
+  background: rgba(214,58,47,0.12);
+  border: 1px solid rgba(214,58,47,0.3);
+  border-radius: 10px;
+  font-size: 11px;
+  color: rgba(214,58,47,0.8);
+  font-family: 'Syne Mono', monospace;
+  display: flex; align-items: flex-start; gap: 10px;
+  letter-spacing: 0.02em;
+}
+.err-pill button { background: none; border: none; color: rgba(214,58,47,0.6); cursor: pointer; flex-shrink: 0; font-size: 14px; line-height: 1; }
+
+/* ── FOOTER ── */
+.footer {
+  background: var(--ink);
+  border-top: 1px solid rgba(247,243,237,0.07);
+  padding: 48px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+}
+.footer-logo {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--bg);
+  letter-spacing: -0.02em;
+}
+.footer-logo span { color: var(--red); }
+.footer-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.footer-link {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(247,243,237,0.35);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 100px;
+  border: 1px solid rgba(247,243,237,0.08);
+  transition: all 0.2s;
+  cursor: pointer;
+  background: none;
+  font-family: 'Syne', sans-serif;
+}
+.footer-link:hover { color: var(--bg); border-color: rgba(247,243,237,0.2); }
+.footer-tag {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(247,243,237,0.2);
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media(max-width: 600px) {
+  .hero { padding: 80px 24px 56px; }
+  .why { padding: 72px 24px; }
+  .manifesto-card { padding: 36px 28px; }
+  .pfp-wrap { padding: 72px 24px; }
+  .footer { padding: 36px 24px; }
+}
+`;
+
 export default function App() {
-  const [page, setPage] = useState("home");
-  useScrollTop(page);
-  const go = (p) => setPage(p);
+  const [uploaded, setUploaded] = useState(null);
+  const [b64, setB64] = useState(null);
+  const [result, setResult] = useState(null);
+  const [forging, setForging] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [err, setErr] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const fileRef = useRef(null);
 
-  const Page = () => {
-    switch (page) {
-      case "home":         return <Home go={go} />;
-      case "how-it-works": return <HowItWorks go={go} />;
-      case "testimonials": return <Testimonials />;
-      case "get-started":  return <GetStarted />;
-      default:             return <Home go={go} />;
-    }
+  const STATUSES = ['Studying your face…', 'Finding the mirror…', 'Swapping both faces…', 'Preserving the character…', 'Almost there…'];
+
+  // Custom cursor
+  useEffect(() => {
+    const move = (e) => setCursorPos({ x: e.clientX, y: e.clientY });
+    window.addEventListener('mousemove', move);
+    return () => window.removeEventListener('mousemove', move);
+  }, []);
+
+  // Status cycling
+  useEffect(() => {
+    if (!forging) return;
+    let i = 0; setStatusMsg(STATUSES[0]);
+    const t = setInterval(() => { i = (i + 1) % STATUSES.length; setStatusMsg(STATUSES[i]); }, 2400);
+    return () => clearInterval(t);
+  }, [forging]);
+
+  const handleFile = (f) => {
+    if (!f || !f.type.startsWith('image/')) return;
+    const r = new FileReader();
+    r.onloadend = () => { setUploaded(r.result); setB64(r.result.split(',')[1]); setResult(null); setErr(null); };
+    r.readAsDataURL(f);
   };
+
+  const copyCA = () => {
+    try { navigator.clipboard.writeText(CA); } catch {
+      const el = document.createElement('textarea'); el.value = CA;
+      document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+    }
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  };
+
+  const forge = async () => {
+    if (!b64 || forging) return;
+    if (!GEMINI_KEY) { setErr('Add VITE_APP_GEMINI to your .env file to enable PFP generation.'); return; }
+    setForging(true); setResult(null); setProgress(0); setErr(null);
+    const timer = setInterval(() => setProgress(p => Math.min(p + Math.random() * 5.5, 88)), 900);
+
+    try {
+      const tRes = await fetch('/template.jpg');
+      if (!tRes.ok) throw new Error('template.jpg not found — add your mascot image to /public/template.jpg');
+      const tBlob = await tRes.blob();
+      const templateB64 = await new Promise(res => {
+        const r = new FileReader(); r.onloadend = () => res(r.result.split(',')[1]); r.readAsDataURL(tBlob);
+      });
+
+      const prompt = `You are performing a face swap on a template image.
+
+Image 1 (TEMPLATE): This is the $ME mascot artwork. It contains TWO versions of the same character — one person holding a mirror, and their reflection inside the mirror. Both figures are the same character.
+
+Image 2 (USER PHOTO): This is a photo of a real person. Extract their facial features, skin tone, and face shape.
+
+YOUR TASK:
+- Replace BOTH faces in Image 1 with the face from Image 2
+- The person holding the mirror: swap their face with the user's face
+- The reflection inside the mirror: also swap with the user's face (they should match since it's a mirror)
+- Keep EVERYTHING else in Image 1 completely unchanged — the body, clothing, pose, the mirror object, the background, art style, colors, lighting, composition
+- Only the faces change, nothing else
+- The result should look like the original $ME mascot artwork but both figures have the user's face
+- Maintain the artistic style of Image 1 — do not make it photorealistic
+- Output square format, same style and quality as Image 1`;
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: 'image/jpeg', data: templateB64 } }, { inlineData: { mimeType: 'image/jpeg', data: b64 } }] }],
+            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
+          })
+        }
+      );
+
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d?.error?.message || `API error ${res.status}`); }
+      const data = await res.json();
+      const imgData = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+      if (!imgData) throw new Error('No image returned — try a clearer, well-lit photo.');
+
+      setTimeout(() => { setResult(`data:image/png;base64,${imgData}`); setProgress(100); setForging(false); }, 400);
+    } catch (e) {
+      setErr(e.message || 'Something went wrong. Try again.');
+      setForging(false);
+    } finally { clearInterval(timer); }
+  };
+
+  const TQ = ['It starts with me','The trenches need you','Change starts here','I am the mirror','Stop waiting','Be the change','$ME','You are the solution'];
+  const TQ2 = [...TQ, ...TQ];
 
   return (
     <>
-      <GlobalStyles />
-      <Navbar page={page} go={go} />
-      <main style={{ paddingTop: "60px" }} id="main-content">
-        <style>{`@media(max-width:640px){#main-content{padding-top:80px}}`}</style>
-        <Page />
-      </main>
-      <Footer go={go} />
+      <style>{css}</style>
+
+      {/* Custom cursor — desktop only */}
+      <div className="cursor" style={{ left: cursorPos.x, top: cursorPos.y }} />
+      <div className="cursor-ring" style={{ left: cursorPos.x, top: cursorPos.y }} />
+
+      {/* NAV */}
+      <nav>
+        <div className="nav-logo">$<span>ME</span></div>
+        <div className="nav-links">
+          <a className="nav-link nav-hide" href={TWITTER} target="_blank" rel="noopener noreferrer">Twitter</a>
+          <a className="nav-link nav-hide" href={COMMUNITY} target="_blank" rel="noopener noreferrer">Community</a>
+          <a className="nav-link cta" href="#pfpcult">Make your PFP</a>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-noise" />
+        <div className="orb orb1" /><div className="orb orb2" /><div className="orb orb3" />
+
+        <div className="hero-eyebrow">Solana · Radical Self-Accountability</div>
+
+        <h1 className="hero-title">
+          Change starts<br/>with <span className="em">$ME</span>
+        </h1>
+
+        <p className="hero-sub">
+          The trenches doesn't need saving from outside.<br/>
+          It needs you to look in the mirror.
+        </p>
+
+        <div className="hero-actions">
+          <a className="btn-primary" href="#pfpcult">Make your $ME PFP →</a>
+          <a className="btn-ghost" href={COMMUNITY} target="_blank" rel="noopener noreferrer">Join the community</a>
+        </div>
+
+        <div className="ca-pill" onClick={copyCA}>
+          <span className="ca-tag">CA</span>
+          <span className="ca-addr">{CA}</span>
+          <span className="ca-act">{copied ? '✓ Copied' : 'Copy'}</span>
+        </div>
+      </section>
+
+      {/* TICKER */}
+      <div className="ticker">
+        <div className="ticker-inner">
+          {TQ2.map((t, i) => (
+            <div key={i} className={`ticker-item ${i % 4 === 0 ? 'hl' : ''}`}>
+              {t}<span className="ticker-sep" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* WHY */}
+      <section className="why">
+        <div className="section-label">Why $ME exists</div>
+
+        <p className="why-intro">
+          The trenches isn't dying because of <em>bundlers or bots.</em><br />
+          It's dying because of us.
+        </p>
+
+        <div className="why-grid">
+          {[
+            { n: '01', h: 'We are the problem', p: 'We snipe each other, dump on each other, follow the same callers into the same traps. Every cycle. Nobody is waiting for themselves to be the solution.' },
+            { n: '02', h: 'We keep looking outside', p: 'New platform, new meta, new narrative. Always waiting for something external to change the outcome. The answer was never out there.' },
+            { n: '03', h: 'The change is internal', p: '$ME is for the person who finally looked in the mirror. Who stopped pointing. Who decided the only thing they can control is themselves.' },
+          ].map(c => (
+            <div key={c.n} className="why-card">
+              <div className="why-n">{c.n}</div>
+              <div className="why-h">{c.h}</div>
+              <div className="why-p">{c.p}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="manifesto-card">
+          <p>Nobody is coming to fix this. Not the platform. Not the devs. Not the next narrative. Not the bull run.</p>
+          <p>The only person who changes how this goes is the person holding the phone right now.</p>
+          <p>I am the floor. I am the culture. I am the solution. It starts with me.</p>
+        </div>
+      </section>
+
+      {/* PFP CULT */}
+      <section className="pfp-wrap" id="pfpcult">
+        <div className="pfp-inner">
+          <div className="pfp-section-label">PFP Cult — AI face swap</div>
+
+          <h2 className="pfp-headline">
+            Upload your face.<br />
+            Become <span>$ME</span>.
+          </h2>
+          <p className="pfp-desc">
+            Our AI places your face on both figures in the $ME mirror artwork — the one holding the mirror, and the reflection.
+          </p>
+
+          <div className="forge-layout">
+            {/* Upload */}
+            <div className="forge-panel">
+              <div className="panel-tag"><span className="panel-tag-dot">1</span>Your photo</div>
+              <div
+                className={`drop-zone ${uploaded ? 'filled' : ''}`}
+                onClick={() => fileRef.current?.click()}
+                onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files?.[0]); }}
+                onDragOver={e => e.preventDefault()}
+              >
+                {uploaded
+                  ? <img src={uploaded} alt="Your face" />
+                  : (
+                    <div className="drop-placeholder">
+                      <div className="drop-icon">📷</div>
+                      <div className="drop-label">Drop your photo here</div>
+                      <div className="drop-sub">or click to browse</div>
+                    </div>
+                  )
+                }
+              </div>
+              <input ref={fileRef} type="file" accept="image/*" onChange={e => handleFile(e.target.files?.[0])} style={{ display: 'none' }} />
+              {uploaded && (
+                <button onClick={() => fileRef.current?.click()} style={{ background: 'none', border: 'none', color: 'rgba(247,243,237,0.3)', fontFamily: 'Syne Mono, monospace', fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer', padding: '4px 0', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = 'rgba(247,243,237,0.7)'} onMouseOut={e => e.currentTarget.style.color = 'rgba(247,243,237,0.3)'}>
+                  Change photo
+                </button>
+              )}
+            </div>
+
+            {/* Result */}
+            <div className="forge-panel">
+              <div className="panel-tag"><span className="panel-tag-dot">2</span>Your $ME PFP</div>
+              <div className={`result-zone ${result ? 'has-result' : ''}`}>
+                {result ? (
+                  <img src={result} alt="Your $ME PFP" />
+                ) : forging ? (
+                  <div className="forging-state">
+                    <div className="forge-spinner" />
+                    <div className="forge-status">{statusMsg}</div>
+                    <div className="forge-pct">{Math.round(progress)}%</div>
+                  </div>
+                ) : (
+                  <div className="result-empty">
+                    <div className="result-empty-big">$ME</div>
+                    <div className="result-empty-hint">Your transformation awaits</div>
+                  </div>
+                )}
+              </div>
+              {forging && <div className="prog-track"><div className="prog-fill" style={{ width: `${progress}%` }} /></div>}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="forge-cta-wrap">
+            {err && <div className="err-pill"><span>{err}</span><button onClick={() => setErr(null)}>✕</button></div>}
+
+            <button className="forge-btn" onClick={forge} disabled={!b64 || forging}>
+              {forging
+                ? <><div style={{ width: 18, height: 18, border: '2px solid rgba(17,16,16,0.15)', borderTopColor: 'var(--red)', borderRadius: '50%', animation: 'spin 1s linear infinite', flexShrink: 0 }} /> Forging your $ME…</>
+                : result ? 'Forge Again →' : 'Forge My $ME PFP →'
+              }
+            </button>
+
+            {result && (
+              <>
+                <button className="dl-btn" onClick={() => { const a = document.createElement('a'); a.href = result; a.download = `ME_PFP_${Date.now()}.png`; a.click(); }}>
+                  Download PFP
+                </button>
+                <div className="share-hint">Set it as your PFP and tag us on X →</div>
+              </>
+            )}
+
+            <div style={{ textAlign: 'center', fontFamily: 'Syne Mono, monospace', fontSize: 9, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(247,243,237,0.18)', marginTop: 6 }}>
+              Powered by Gemini AI · Images are never stored
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="footer-logo">$<span>ME</span></div>
+        <div className="footer-links">
+          <a className="footer-link" href={TWITTER} target="_blank" rel="noopener noreferrer">Twitter</a>
+          <a className="footer-link" href={COMMUNITY} target="_blank" rel="noopener noreferrer">Community</a>
+          <button className="footer-link" onClick={copyCA}>{copied ? '✓ Copied' : 'Copy CA'}</button>
+        </div>
+        <div className="footer-tag">It starts with me.</div>
+      </footer>
     </>
   );
 }
