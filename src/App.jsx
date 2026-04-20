@@ -616,7 +616,16 @@ Inside the mirror, show the same character, but as an uplifted and improved vers
 
 The entire final image should match the art style of the user’s image. Adapt the full scene (character, background, lighting) so everything looks consistent in that style.
 
-The final result should look like the user’s character is standing there, holding a mirror, and seeing the best version of themselves.`;
+The final result should look like the user’s character is standing there, holding a mirror, and seeing the best version of themselves. No trace of the original template character should remain.
+
+Before finalizing, confirm that:
+- The template character has been completely replaced
+- The pose and composition match the original template
+- The same character appears both outside and inside the mirror
+- The reflection clearly looks like an improved version of the same character
+- The art style matches the user’s image across the entire scene
+
+If any of these are not true, correct the image before completing the task.`;
 
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`,
