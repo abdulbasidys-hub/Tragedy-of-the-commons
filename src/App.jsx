@@ -815,57 +815,38 @@ export default function App() {
         const r = new FileReader(); r.onloadend = () => res(r.result.split(',')[1]); r.readAsDataURL(tBlob);
       });
 
-      const prompt = `You are given two images:
+      const prompt = `You are given:
 
-- Image 1 (TEMPLATE): A composition showing a character holding a mirror and their reflection.
-- Image 2 (USER IMAGE): The user’s character or face.
+- Image 1 (TEMPLATE): A character holding a mirror with their reflection.
+- Image 2 (USER IMAGE): The user’s character.
 
-YOUR TASK:
+TASK:
+Transform Image 1 so the character becomes the one from Image 2, while keeping the mirror concept.
 
-Transform Image 1 so that the character becomes the user’s character from Image 2, while preserving the mirror concept.
+RULES:
 
-CORE RULES:
+1. IDENTITY
+- Replace the character in both positions with the user’s character (face, hair, skin tone).
+- Outer character and reflection must be the SAME person.
 
-1. IDENTITY TRANSFER
-- Replace the character in Image 1 with the character from Image 2.
-- This includes the face, hairstyle, skin tone, and outfit.
-- The outer character (holding the mirror) and the reflection must represent the SAME identity.
+2. MIRROR EFFECT
+- Outer character = normal/current version.
+- Reflection = uplifted / ideal version (more confident, refined, powerful).
+- Do not change identity, only enhance presence.
 
-2. MIRROR CONCEPT (CRITICAL)
-- The outer character = the “current” version.
-- The reflection = the “uplifted / ideal / best version” of the same character.
-- The reflection should look more confident, refined, powerful, or successful.
-- Do NOT change identity — only enhance presence, expression, and subtle details.
+3. STYLE
+- The final image MUST match the art style of Image 2.
+- Apply this style consistently to the entire scene.
 
-3. STYLE ADAPTATION
-- The FINAL IMAGE must adopt the art style of Image 2 (the user’s image).
-- Convert the entire scene (including background, lighting, and rendering) to match the user’s style.
-- Ensure everything looks cohesive in that style (anime, realistic, cartoon, etc.).
+4. CLOTHING
+- Use the outfit from Image 2 (adapt if needed to fit pose).
 
-4. CLOTHING & DESIGN
-- The character’s outfit should match or be inspired by the outfit in Image 2.
-- You may adapt it to fit the pose naturally, but keep it recognizable.
+5. COMPOSITION
+- Keep the mirror scene and layout from Image 1 unchanged.
 
-5. COMPOSITION PRESERVATION
-- Keep the composition of Image 1:
-  - Character holding a mirror
-  - Reflection visible inside the mirror
-  - Same framing and layout
-- Do NOT remove the mirror or change the core concept.
-
-6. LIGHTING & INTEGRATION
-- Adjust lighting, shading, and colors to match the new style.
-- Ensure both the character and reflection feel naturally integrated.
-
-7. FACE & ANGLES
-- Adapt the face to match the head angles in both positions.
-- Maintain consistency between outer character and reflection.
-
-8. OUTPUT
-- Square format (1:1)
-- High quality
-- Clean, seamless, and visually striking
-- The result should feel like the user’s character discovering their best self`;
+6. QUALITY
+- Match angles, lighting, and proportions.
+- Output a clean, seamless, high-quality square (1:1) image.`;
 
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`,
