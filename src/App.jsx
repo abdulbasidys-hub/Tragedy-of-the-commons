@@ -1,187 +1,60 @@
 import { useState, useEffect, useRef } from "react";
 
+// ─── DATA ──────────────────────────────────────────────────────────────────
 const CARDS = [
   {
     id: 1,
-    icon: "🐟",
-    title: "Overfishing",
-    subtitle: "Liquidity drained too early",
-    commons: [
-      "Fishermen race to catch before others do.",
-      "No one waits. Everyone extracts.",
-      "The ocean empties faster than it can recover.",
-      "Rational individuals. Irrational outcome.",
-    ],
-    meme: [
-      "Every wave dumps at the same time.",
-      "No one holds. The chart bleeds.",
-      "The pool empties before price can grow.",
-    ],
+    icon: "⟳",
+    title: "Overtrading",
+    tag: "Liquidity Drain",
+    analogy: "Rivers diverted too many times run dry before reaching the sea.",
+    meme: "We rotate before anything compounds. Liquidity leaves before price can breathe.",
+    color: "#ff3c3c",
   },
   {
     id: 2,
-    icon: "🐄",
-    title: "Grazing Land",
-    subtitle: "Too many coins, not enough attention",
-    commons: [
-      "Each herder adds one more cow.",
-      "The field looks fine — until it doesn't.",
-      "Overgrazing destroys the land for everyone.",
-      "Tragedy hides until it's too late.",
-    ],
-    meme: [
-      "500 new tokens launch every day.",
-      "Attention is finite. Coins are not.",
-      "Every new launch dilutes the last.",
-    ],
+    icon: "◈",
+    title: "Attention Fragmentation",
+    tag: "Too Many Coins",
+    analogy: "A field grazed by too many herds grows nothing for anyone.",
+    meme: "500 launches a day means every project starves for focus. Including yours.",
+    color: "#ffaa00",
   },
   {
     id: 3,
-    icon: "💨",
-    title: "Air Pollution",
-    subtitle: "Rugs destroy trust for everyone",
-    commons: [
-      "One factory pollutes. Everyone breathes it.",
-      "Private gain. Public cost.",
-      "The damage is invisible until it compounds.",
-      "Trust, like air, is shared.",
-    ],
-    meme: [
-      "One rug poisons the ecosystem.",
-      "New buyers hesitate. Volume drops for all.",
-      "The rug didn't just hurt one — it hurt everyone.",
-    ],
+    icon: "◬",
+    title: "Trust Erosion",
+    tag: "Rugs & Low Effort",
+    analogy: "One factory's smoke poisons air that everyone shares.",
+    meme: "Each rug doesn't just kill one coin. It raises the cost of belief for all of us.",
+    color: "#ff3c3c",
   },
   {
     id: 4,
-    icon: "🚗",
-    title: "Traffic Congestion",
-    subtitle: "Market overcrowding",
-    commons: [
-      "Each car adds seconds to everyone's commute.",
-      "Individually rational. Collectively catastrophic.",
-      "The road works — until it doesn't.",
-      "No single driver causes the gridlock. All of them do.",
-    ],
-    meme: [
-      "Every new memecoin clogs the attention highway.",
-      "Buys slow. Charts flatten. Interest dies.",
-      "One more launch is one too many.",
-    ],
-  },
-  {
-    id: 5,
-    icon: "💧",
-    title: "Groundwater",
-    subtitle: "Capital exhaustion",
-    commons: [
-      "Invisible resource. Visible destruction.",
-      "Drawn faster than it can replenish.",
-      "Everyone pumps until the well runs dry.",
-      "No one owns it. No one protects it.",
-    ],
-    meme: [
-      "Capital rotates before it can compound.",
-      "Profit-taking drains what patience would multiply.",
-      "The well was never empty. We just kept pumping.",
-    ],
-  },
-  {
-    id: 6,
-    icon: "📧",
-    title: "Spam",
-    subtitle: "Too many low-quality launches",
-    commons: [
-      "One spam email costs nothing to send.",
-      "A billion of them breaks the entire system.",
-      "The sender profits. The network suffers.",
-      "Volume is the weapon against quality.",
-    ],
-    meme: [
-      "Low-effort launches flood every feed.",
-      "Signal disappears in noise.",
-      "When everything launches, nothing matters.",
-    ],
-  },
-  {
-    id: 7,
-    icon: "🏛️",
-    title: "Tourism Overload",
-    subtitle: "Hype loses meaning",
-    commons: [
-      "Beautiful place. Too many visitors.",
-      "The thing that made it special — gone.",
-      "Everyone wants to experience it. Few want to preserve it.",
-      "Popularity destroys the reason to visit.",
-    ],
-    meme: [
-      "Every coin promises to be the next one.",
-      "Hype repeats until no one believes it.",
-      "The signal that used to work — doesn't anymore.",
-    ],
-  },
-  {
-    id: 8,
-    icon: "📶",
-    title: "Shared Wi-Fi",
-    subtitle: "Liquidity spreads too thin",
-    commons: [
-      "One connection. Too many devices.",
-      "Each user gets a fraction of what they need.",
-      "No one is satisfied. The network strains.",
-      "Sharing without limits means no one thrives.",
-    ],
-    meme: [
-      "Capital split across hundreds of coins.",
-      "None gets enough to grow.",
-      "Thin liquidity. Thin charts. Thin community.",
-    ],
-  },
-  {
-    id: 9,
-    icon: "💻",
-    title: "Open Source",
-    subtitle: "Everyone benefits, no one holds",
-    commons: [
-      "The code is free. The work is not.",
-      "Everyone uses it. Few contribute back.",
-      "The project lives on contributions it never receives.",
-      "Benefit without ownership destroys the incentive to build.",
-    ],
-    meme: [
-      "Everyone waits for others to hold the floor.",
-      "Community vibes. No conviction.",
-      "The project needed believers. Got spectators.",
-    ],
-  },
-  {
-    id: 10,
-    icon: "⚔️",
-    title: "Arms Race",
-    subtitle: "Faster launches, worse outcomes",
-    commons: [
-      "Both sides build weapons. Neither gains advantage.",
-      "Resources consumed. Security unchanged.",
-      "The race accelerates. The outcome worsens.",
-      "Competing to compete — not to win.",
-    ],
-    meme: [
-      "Launch faster. Market harder. Rug quicker.",
-      "Everyone accelerates. No one builds.",
-      "The race to be next leaves nothing worth finding.",
-    ],
+    icon: "◯",
+    title: "Lack of Conviction",
+    tag: "No Holding Culture",
+    analogy: "Open land with no stewards slowly becomes wasteland.",
+    meme: "Everyone wants the gain. No one wants to carry the weight of holding.",
+    color: "#00ff80",
   },
 ];
 
 const REFLECTION_LINES = ["We chase.", "We rotate.", "We abandon.", "We repeat."];
-const SOLUTION_LINES = ["Hold longer.", "Choose better.", "Build together.", "Let something grow."];
+const SOLUTION_LINES = [
+  { text: "Hold longer.", sub: "Time is the asset." },
+  { text: "Choose better.", sub: "Fewer. Stronger." },
+  { text: "Build together.", sub: "Not against each other." },
+  { text: "Let it grow.", sub: "Or keep losing." },
+];
 
-function useInView(threshold = 0.15) {
+// ─── HOOKS ─────────────────────────────────────────────────────────────────
+function useInView(threshold = 0.12) {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      ([e]) => { if (e.isIntersecting) setInView(true); },
       { threshold }
     );
     if (ref.current) obs.observe(ref.current);
@@ -190,431 +63,344 @@ function useInView(threshold = 0.15) {
   return [ref, inView];
 }
 
-function AnimatedLine({ children, delay = 0, className = "" }) {
-  const [ref, inView] = useInView(0.3);
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function HeroCanvas() {
-  const canvasRef = useRef(null);
+// ─── ANIMATED CANVAS BG ────────────────────────────────────────────────────
+function HeroBG() {
+  const cvs = useRef(null);
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    let animId;
-    let t = 0;
+    const c = cvs.current;
+    const ctx = c.getContext("2d");
+    let id, t = 0;
     const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
     };
     resize();
     window.addEventListener("resize", resize);
-
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-
-      // Spiral arms
-      for (let arm = 0; arm < 3; arm++) {
+      ctx.clearRect(0, 0, c.width, c.height);
+      const cx = c.width / 2, cy = c.height / 2;
+      for (let a = 0; a < 3; a++) {
+        const off = (a * Math.PI * 2) / 3;
         ctx.beginPath();
-        const armOffset = (arm * Math.PI * 2) / 3;
-        for (let i = 0; i < 200; i++) {
-          const angle = (i / 30) + t * 0.008 + armOffset;
-          const r = i * 1.9;
-          const x = cx + r * Math.cos(angle);
-          const y = cy + r * Math.sin(angle) * 0.5;
-          const alpha = (1 - i / 200) * 0.18;
-          if (i === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
+        for (let i = 0; i < 180; i++) {
+          const ang = i / 28 + t * 0.006 + off;
+          const r = i * 2.1;
+          const x = cx + r * Math.cos(ang);
+          const y = cy + r * Math.sin(ang) * 0.45;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = arm === 0 ? `rgba(0,255,128,${0.12})` : arm === 1 ? `rgba(255,60,60,${0.10})` : `rgba(255,255,255,${0.06})`;
+        const col = a === 0 ? "0,255,128" : a === 1 ? "255,60,60" : "255,255,255";
+        ctx.strokeStyle = `rgba(${col},${a === 2 ? 0.04 : 0.07})`;
         ctx.lineWidth = 1;
         ctx.stroke();
       }
-
-      // Flowing horizontal lines
-      for (let i = 0; i < 8; i++) {
-        const y = (canvas.height / 9) * (i + 1);
+      for (let i = 0; i < 6; i++) {
+        const y = (c.height / 7) * (i + 1);
         ctx.beginPath();
-        for (let x = 0; x < canvas.width; x += 4) {
-          const wave = Math.sin((x / canvas.width) * Math.PI * 4 + t * 0.012 + i * 0.8) * 12;
-          if (x === 0) ctx.moveTo(x, y + wave);
-          else ctx.lineTo(x, y + wave);
+        for (let x = 0; x <= c.width; x += 6) {
+          const w = Math.sin((x / c.width) * Math.PI * 5 + t * 0.009 + i) * 10;
+          x === 0 ? ctx.moveTo(x, y + w) : ctx.lineTo(x, y + w);
         }
-        ctx.strokeStyle = `rgba(0,255,128,${0.04 + (i % 3) * 0.01})`;
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = `rgba(0,255,128,${0.022 + (i % 3) * 0.007})`;
+        ctx.lineWidth = 0.7;
         ctx.stroke();
       }
-
       t++;
-      animId = requestAnimationFrame(draw);
+      id = requestAnimationFrame(draw);
     };
     draw();
-    return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
+    return () => { cancelAnimationFrame(id); window.removeEventListener("resize", resize); };
   }, []);
   return (
     <canvas
-      ref={canvasRef}
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.7 }}
+      ref={cvs}
+      style={{
+        position: "fixed", inset: 0,
+        width: "100vw", height: "100vh",
+        pointerEvents: "none", zIndex: 0, opacity: 0.55,
+      }}
     />
   );
 }
 
-function Card({ card, index }) {
-  const [open, setOpen] = useState(false);
-  const [ref, inView] = useInView(0.1);
+// ─── REVEAL WRAPPER ────────────────────────────────────────────────────────
+function Reveal({ children, delay = 0, style = {} }) {
+  const [ref, inView] = useInView();
   return (
     <div
       ref={ref}
-      onClick={() => setOpen(!open)}
       style={{
-        background: open ? "rgba(0,255,128,0.04)" : "rgba(255,255,255,0.025)",
-        border: open ? "1px solid rgba(0,255,128,0.35)" : "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 2,
-        cursor: "pointer",
-        transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
         opacity: inView ? 1 : 0,
-        transform: inView ? "translateX(0)" : "translateX(-20px)",
-        transitionDelay: `${(index % 5) * 0.07}s`,
-        overflow: "hidden",
-        userSelect: "none",
+        transform: inView ? "translateY(0px)" : "translateY(20px)",
+        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
+        ...style,
       }}
     >
-      {/* Header */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 16,
-        padding: "18px 24px",
-        position: "relative",
-      }}>
-        <span style={{ fontSize: 22, minWidth: 32, textAlign: "center", filter: open ? "none" : "grayscale(0.5)" }}>{card.icon}</span>
-        <div style={{ flex: 1 }}>
-          <div style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: 13,
-            color: open ? "#00ff80" : "rgba(255,255,255,0.85)",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            fontWeight: 700,
-            transition: "color 0.3s",
-          }}>
-            {card.title}
-          </div>
-          <div style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: 11,
-            color: "rgba(255,255,255,0.35)",
-            letterSpacing: "0.05em",
-            marginTop: 2,
-          }}>
-            {card.subtitle}
-          </div>
-        </div>
-        <div style={{
-          fontFamily: "'Space Mono', monospace",
-          fontSize: 11,
-          color: open ? "#00ff80" : "rgba(255,255,255,0.2)",
-          transition: "transform 0.3s, color 0.3s",
-          transform: open ? "rotate(45deg)" : "rotate(0deg)",
-        }}>
-          +
-        </div>
-        <div style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 2,
-          background: open ? "#00ff80" : "transparent",
-          transition: "background 0.3s",
-        }} />
-      </div>
-
-      {/* Expanded content */}
-      <div style={{
-        maxHeight: open ? 400 : 0,
-        overflow: "hidden",
-        transition: "max-height 0.45s cubic-bezier(0.4,0,0.2,1)",
-      }}>
-        <div style={{ padding: "0 24px 22px 72px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-          <div>
-            <div style={{
-              fontFamily: "'Space Mono', monospace",
-              fontSize: 9,
-              color: "rgba(255,255,255,0.3)",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              marginBottom: 10,
-            }}>
-              THE COMMONS
-            </div>
-            {card.commons.map((line, i) => (
-              <div key={i} style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 13,
-                color: "rgba(255,255,255,0.6)",
-                lineHeight: 1.65,
-                marginBottom: 4,
-              }}>
-                {line}
-              </div>
-            ))}
-          </div>
-          <div>
-            <div style={{
-              fontFamily: "'Space Mono', monospace",
-              fontSize: 9,
-              color: "rgba(255,60,60,0.6)",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              marginBottom: 10,
-            }}>
-              IN MEMECOINS
-            </div>
-            {card.meme.map((line, i) => (
-              <div key={i} style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 13,
-                color: "rgba(255,255,255,0.75)",
-                lineHeight: 1.65,
-                marginBottom: 4,
-                borderLeft: "2px solid rgba(255,60,60,0.4)",
-                paddingLeft: 10,
-              }}>
-                {line}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SectionLabel({ children }) {
-  return (
-    <div style={{
-      fontFamily: "'Space Mono', monospace",
-      fontSize: 10,
-      letterSpacing: "0.25em",
-      textTransform: "uppercase",
-      color: "rgba(0,255,128,0.5)",
-      marginBottom: 20,
-      display: "flex",
-      alignItems: "center",
-      gap: 12,
-    }}>
-      <span style={{ display: "inline-block", width: 24, height: 1, background: "rgba(0,255,128,0.4)" }} />
       {children}
     </div>
   );
 }
 
-export default function App() {
-  const heroRef = useRef(null);
-  const infographicRef = useRef(null);
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const scrollToInfographic = () => {
-    infographicRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+// ─── SECTION LABEL ─────────────────────────────────────────────────────────
+function Label({ children }) {
   return (
     <div style={{
-      background: "#080808",
-      color: "white",
-      fontFamily: "'DM Sans', sans-serif",
-      minHeight: "100vh",
-      overflowX: "hidden",
+      display: "inline-flex", alignItems: "center", gap: 10,
+      fontFamily: "'Space Mono', monospace", fontSize: 9,
+      letterSpacing: "0.28em", textTransform: "uppercase",
+      color: "rgba(0,255,128,0.55)", marginBottom: 18,
     }}>
+      <span style={{
+        width: 20, height: 1,
+        background: "rgba(0,255,128,0.45)",
+        display: "inline-block",
+      }} />
+      {children}
+    </div>
+  );
+}
+
+// ─── CARD ──────────────────────────────────────────────────────────────────
+function Card({ card, index }) {
+  const [open, setOpen] = useState(false);
+  const [ref, inView] = useInView(0.08);
+  return (
+    <div
+      ref={ref}
+      onClick={() => setOpen(o => !o)}
+      style={{
+        background: open ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+        border: `1px solid ${open ? "rgba(0,255,128,0.28)" : "rgba(255,255,255,0.07)"}`,
+        cursor: "pointer",
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0)" : "translateY(16px)",
+        transition: `opacity 0.55s ease ${index * 0.08}s, transform 0.55s ease ${index * 0.08}s, background 0.28s, border-color 0.28s`,
+        WebkitTapHighlightColor: "transparent",
+        userSelect: "none",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Left accent bar */}
+      <div style={{
+        position: "absolute", left: 0, top: 0, bottom: 0, width: 2,
+        background: open ? card.color : "transparent",
+        transition: "background 0.28s",
+      }} />
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 22px" }}>
+        <span style={{
+          fontFamily: "'Space Mono', monospace", fontSize: 18,
+          color: open ? card.color : "rgba(255,255,255,0.28)",
+          transition: "color 0.28s", minWidth: 28, textAlign: "center", lineHeight: 1,
+        }}>
+          {card.icon}
+        </span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontFamily: "'Space Mono', monospace", fontWeight: 700,
+            fontSize: "clamp(13px, 3.5vw, 15px)",
+            color: open ? "white" : "rgba(255,255,255,0.72)",
+            transition: "color 0.28s", letterSpacing: "0.04em",
+          }}>
+            {card.title}
+          </div>
+          <div style={{
+            fontFamily: "'DM Sans', sans-serif", fontSize: 10,
+            color: "rgba(255,255,255,0.26)", marginTop: 3,
+            letterSpacing: "0.08em", textTransform: "uppercase",
+          }}>
+            {card.tag}
+          </div>
+        </div>
+        <div style={{
+          fontFamily: "'Space Mono', monospace", fontSize: 18,
+          color: open ? "#00ff80" : "rgba(255,255,255,0.18)",
+          transform: open ? "rotate(45deg)" : "rotate(0deg)",
+          transition: "transform 0.28s, color 0.28s",
+          lineHeight: 1, minWidth: 18, textAlign: "center",
+        }}>
+          +
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{
+        maxHeight: open ? 200 : 0,
+        overflow: "hidden",
+        transition: "max-height 0.4s cubic-bezier(.4,0,.2,1)",
+      }}>
+        <div style={{ padding: "0 22px 22px 66px" }}>
+          <div style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: "clamp(12px, 3.2vw, 14px)",
+            color: "rgba(255,255,255,0.35)", lineHeight: 1.7,
+            marginBottom: 12, fontStyle: "italic",
+          }}>
+            {card.analogy}
+          </div>
+          <div style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: "clamp(12px, 3.2vw, 14px)",
+            color: "rgba(255,255,255,0.68)", lineHeight: 1.7,
+            borderLeft: `2px solid ${card.color}44`, paddingLeft: 14,
+          }}>
+            {card.meme}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN APP ──────────────────────────────────────────────────────────────
+export default function App() {
+  const [scrollY, setScrollY] = useState(0);
+  const infRef = useRef(null);
+
+  useEffect(() => {
+    const fn = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  return (
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;700&family=Space+Grotesk:wght@700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        ::selection { background: rgba(0,255,128,0.25); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #080808; }
-        ::-webkit-scrollbar-thumb { background: rgba(0,255,128,0.3); border-radius: 2px; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        
-        .cta-btn {
-          font-family: 'Space Mono', monospace;
-          font-size: 11px;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          border: 1px solid rgba(0,255,128,0.5);
-          background: transparent;
-          color: #00ff80;
-          padding: 14px 32px;
-          cursor: pointer;
-          transition: all 0.3s;
-          position: relative;
-          overflow: hidden;
+        body {
+          background: #070707;
+          color: #fff;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          overflow-x: hidden;
+          width: 100%;
         }
-        .cta-btn::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: rgba(0,255,128,0.08);
-          transform: translateX(-100%);
-          transition: transform 0.3s;
-        }
-        .cta-btn:hover::before { transform: translateX(0); }
-        .cta-btn:hover { border-color: #00ff80; box-shadow: 0 0 20px rgba(0,255,128,0.15); }
+        #root { width: 100%; }
 
-        .ghost-btn {
-          font-family: 'Space Mono', monospace;
-          font-size: 11px;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          border: 1px solid rgba(255,255,255,0.15);
-          background: transparent;
-          color: rgba(255,255,255,0.5);
-          padding: 12px 24px;
-          cursor: pointer;
-          transition: all 0.3s;
-        }
-        .ghost-btn:hover { border-color: rgba(255,255,255,0.4); color: white; }
+        ::selection { background: rgba(0,255,128,0.2); }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: #070707; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,255,128,0.22); }
 
-        @media (max-width: 680px) {
-          .cards-expanded-grid { grid-template-columns: 1fr !important; }
-          .hero-title { font-size: clamp(36px, 12vw, 80px) !important; }
-          .coin-address { font-size: 10px !important; }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes glowPulse {
+          0%, 100% { text-shadow: none; }
+          50%       { text-shadow: 0 0 70px rgba(0,255,128,0.16); }
+        }
+        @keyframes scrollDrop {
+          0%, 100% { transform: translateY(0); opacity: 0.5; }
+          60%       { transform: translateY(9px); opacity: 0.12; }
+        }
+
+        .btn-primary {
+          font-family: 'Space Mono', monospace;
+          font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+          border: 1px solid rgba(0,255,128,0.5); background: transparent;
+          color: #00ff80; padding: 15px 36px; cursor: pointer;
+          transition: all 0.26s; min-height: 48px; min-width: 120px;
+          position: relative; overflow: hidden;
+        }
+        .btn-primary::after {
+          content: ''; position: absolute; inset: 0;
+          background: rgba(0,255,128,0.07);
+          transform: translateX(-101%); transition: transform 0.26s;
+        }
+        .btn-primary:hover::after,
+        .btn-primary:active::after { transform: translateX(0); }
+        .btn-primary:hover { box-shadow: 0 0 28px rgba(0,255,128,0.1); }
+
+        .btn-ghost {
+          font-family: 'Space Mono', monospace;
+          font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+          border: 1px solid rgba(255,255,255,0.11); background: transparent;
+          color: rgba(255,255,255,0.42); padding: 15px 28px; cursor: pointer;
+          transition: all 0.26s; min-height: 48px; min-width: 100px;
+        }
+        .btn-ghost:hover { border-color: rgba(255,255,255,0.32); color: rgba(255,255,255,0.8); }
       `}</style>
 
-      {/* ─── HERO ─── */}
-      <section
-        ref={heroRef}
-        style={{
-          position: "relative",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          padding: "80px 24px",
-          overflow: "hidden",
-        }}
-      >
-        <HeroCanvas />
+      <HeroBG />
 
-        {/* Grid overlay */}
+      {/* ══ HERO ══════════════════════════════════════════════════ */}
+      <section style={{
+        position: "relative", zIndex: 1,
+        width: "100%", minHeight: "100vh",
+        display: "flex", flexDirection: "column",
+        justifyContent: "center", alignItems: "center",
+        textAlign: "center", padding: "100px 20px 80px",
+        overflow: "hidden",
+      }}>
+        {/* Dot grid */}
         <div style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-          pointerEvents: "none",
+          position: "absolute", inset: 0, pointerEvents: "none",
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
         }} />
-
         {/* Vignette */}
         <div style={{
-          position: "absolute",
-          inset: 0,
-          background: "radial-gradient(ellipse at center, transparent 40%, #080808 85%)",
-          pointerEvents: "none",
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "radial-gradient(ellipse 85% 75% at 50% 50%, transparent 30%, #070707 82%)",
         }} />
 
-        {/* Scroll parallax wrapper */}
         <div style={{
-          position: "relative",
-          zIndex: 2,
-          transform: `translateY(${scrollY * 0.15}px)`,
+          position: "relative", zIndex: 1,
+          maxWidth: 660, width: "100%",
+          transform: `translateY(${scrollY * 0.1}px)`,
         }}>
-          {/* Pre-title */}
           <div style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: 10,
-            letterSpacing: "0.3em",
-            textTransform: "uppercase",
-            color: "rgba(0,255,128,0.6)",
-            marginBottom: 28,
-            animation: "fadeUp 1s ease 0.2s both",
+            fontFamily: "'Space Mono', monospace", fontSize: 10,
+            letterSpacing: "0.28em", textTransform: "uppercase",
+            color: "rgba(0,255,128,0.5)", marginBottom: 30,
+            animation: "fadeUp 0.85s ease 0.1s both",
           }}>
-            <style>{`
-              @keyframes fadeUp {
-                from { opacity: 0; transform: translateY(16px); }
-                to { opacity: 1; transform: translateY(0); }
-              }
-              @keyframes pulse-glow {
-                0%, 100% { text-shadow: 0 0 20px rgba(0,255,128,0.1); }
-                50% { text-shadow: 0 0 40px rgba(0,255,128,0.25), 0 0 80px rgba(0,255,128,0.08); }
-              }
-            `}</style>
-            Solana · Commons Theory · 2025
+            Solana · 2025
           </div>
 
-          {/* Main title */}
-          <h1
-            className="hero-title"
-            style={{
-              fontFamily: "'Space Mono', monospace",
-              fontSize: "clamp(42px, 8vw, 88px)",
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: "-0.02em",
-              marginBottom: 24,
-              animation: "fadeUp 1s ease 0.4s both",
-              animation: "fadeUp 1s ease 0.4s both, pulse-glow 4s ease 2s infinite",
-            }}
-          >
-            Tragedy of<br />
-            <span style={{
-              color: "transparent",
-              WebkitTextStroke: "1px rgba(255,255,255,0.4)",
-            }}>
-              the Commons
+          <h1 style={{
+            fontFamily: "'Space Mono', monospace", fontWeight: 700,
+            fontSize: "clamp(40px, 10vw, 96px)", lineHeight: 0.98,
+            letterSpacing: "-0.028em", marginBottom: 22,
+            animation: "fadeUp 0.85s ease 0.28s both, glowPulse 5s ease 1.8s infinite",
+          }}>
+            Tragedy<br />
+            <span style={{ color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.28)" }}>
+              of the
             </span>
+            <br />Commons
           </h1>
 
-          {/* Subtitle */}
           <div style={{
             fontFamily: "'Space Mono', monospace",
-            fontSize: "clamp(18px, 3vw, 26px)",
-            color: "rgba(255,60,60,0.9)",
-            letterSpacing: "0.05em",
-            marginBottom: 16,
-            animation: "fadeUp 1s ease 0.6s both",
+            fontSize: "clamp(15px, 4.5vw, 22px)",
+            color: "rgba(255,60,60,0.85)", letterSpacing: "0.05em",
+            marginBottom: 12,
+            animation: "fadeUp 0.85s ease 0.46s both",
           }}>
             We are the problem.
           </div>
 
           <div style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: 16,
-            color: "rgba(255,255,255,0.4)",
-            letterSpacing: "0.04em",
-            marginBottom: 52,
-            animation: "fadeUp 1s ease 0.8s both",
+            fontSize: "clamp(13px, 3.5vw, 16px)",
+            color: "rgba(255,255,255,0.3)", marginBottom: 50,
+            animation: "fadeUp 0.85s ease 0.6s both",
           }}>
             When everyone extracts, nothing grows.
           </div>
 
-          <div style={{ animation: "fadeUp 1s ease 1s both" }}>
-            <button className="cta-btn" onClick={scrollToInfographic}>
+          <div style={{ animation: "fadeUp 0.85s ease 0.74s both" }}>
+            <button
+              className="btn-primary"
+              onClick={() => infRef.current?.scrollIntoView({ behavior: "smooth" })}
+            >
               See the Pattern
             </button>
           </div>
@@ -622,411 +408,314 @@ export default function App() {
 
         {/* Corner marks */}
         {[
-          { top: 20, left: 20 },
-          { top: 20, right: 20 },
-          { bottom: 20, left: 20 },
-          { bottom: 20, right: 20 },
-        ].map((pos, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              width: 20,
-              height: 20,
-              ...pos,
-              borderTop: i < 2 ? "1px solid rgba(255,255,255,0.12)" : undefined,
-              borderBottom: i >= 2 ? "1px solid rgba(255,255,255,0.12)" : undefined,
-              borderLeft: i % 2 === 0 ? "1px solid rgba(255,255,255,0.12)" : undefined,
-              borderRight: i % 2 === 1 ? "1px solid rgba(255,255,255,0.12)" : undefined,
-            }}
-          />
+          { top: 18, left: 18, borderTop: "1px solid rgba(255,255,255,0.09)", borderLeft: "1px solid rgba(255,255,255,0.09)" },
+          { top: 18, right: 18, borderTop: "1px solid rgba(255,255,255,0.09)", borderRight: "1px solid rgba(255,255,255,0.09)" },
+          { bottom: 18, left: 18, borderBottom: "1px solid rgba(255,255,255,0.09)", borderLeft: "1px solid rgba(255,255,255,0.09)" },
+          { bottom: 18, right: 18, borderBottom: "1px solid rgba(255,255,255,0.09)", borderRight: "1px solid rgba(255,255,255,0.09)" },
+        ].map((s, i) => (
+          <div key={i} style={{ position: "absolute", width: 18, height: 18, ...s }} />
         ))}
 
-        {/* Scroll indicator */}
+        {/* Scroll cue */}
         <div style={{
-          position: "absolute",
-          bottom: 32,
-          left: "50%",
+          position: "absolute", bottom: 26, left: "50%",
           transform: "translateX(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 6,
-          opacity: scrollY > 50 ? 0 : 0.4,
-          transition: "opacity 0.4s",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+          opacity: scrollY > 60 ? 0 : 0.32, transition: "opacity 0.4s",
+          pointerEvents: "none",
         }}>
           <div style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: 9,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-          }}>
-            scroll
-          </div>
+            fontFamily: "'Space Mono', monospace", fontSize: 9,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+          }}>scroll</div>
           <div style={{
-            width: 1,
-            height: 32,
-            background: "linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)",
-            animation: "scrollPulse 2s ease infinite",
-          }}>
-            <style>{`
-              @keyframes scrollPulse {
-                0% { transform: scaleY(0); transform-origin: top; }
-                50% { transform: scaleY(1); transform-origin: top; }
-                51% { transform: scaleY(1); transform-origin: bottom; }
-                100% { transform: scaleY(0); transform-origin: bottom; }
-              }
-            `}</style>
-          </div>
+            width: 1, height: 26,
+            background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)",
+            animation: "scrollDrop 2s ease infinite",
+          }} />
         </div>
       </section>
 
-      {/* ─── INFOGRAPHIC ─── */}
-      <section
-        ref={infographicRef}
-        style={{
-          maxWidth: 860,
-          margin: "0 auto",
-          padding: "120px 24px",
-        }}
-      >
-        <AnimatedLine>
-          <SectionLabel>The Pattern</SectionLabel>
-        </AnimatedLine>
-
-        <AnimatedLine delay={0.1}>
-          <h2 style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: "clamp(26px, 4vw, 42px)",
-            fontWeight: 700,
-            lineHeight: 1.2,
-            marginBottom: 12,
-          }}>
-            Ten Commons.
-          </h2>
-        </AnimatedLine>
-        <AnimatedLine delay={0.2}>
-          <h2 style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: "clamp(26px, 4vw, 42px)",
-            fontWeight: 700,
-            lineHeight: 1.2,
-            color: "transparent",
-            WebkitTextStroke: "1px rgba(255,255,255,0.35)",
-            marginBottom: 48,
-          }}>
-            One Behavior.
-          </h2>
-        </AnimatedLine>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {CARDS.map((card, i) => (
-            <Card key={card.id} card={card} index={i} />
-          ))}
-        </div>
-      </section>
-
-      {/* ─── DIVIDER ─── */}
-      <div style={{
-        maxWidth: 860,
-        margin: "0 auto",
-        padding: "0 24px",
-        display: "flex",
-        alignItems: "center",
-        gap: 16,
-        opacity: 0.15,
+      {/* ══ INFOGRAPHIC ═══════════════════════════════════════════ */}
+      <section ref={infRef} style={{
+        position: "relative", zIndex: 1,
+        width: "100%", padding: "100px 0",
       }}>
-        <div style={{ flex: 1, height: 1, background: "white" }} />
-        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: "0.2em" }}>○</div>
-        <div style={{ flex: 1, height: 1, background: "white" }} />
-      </div>
-
-      {/* ─── REFLECTION ─── */}
-      <section style={{
-        maxWidth: 860,
-        margin: "0 auto",
-        padding: "120px 24px",
-        textAlign: "center",
-      }}>
-        <AnimatedLine>
-          <SectionLabel style={{ justifyContent: "center" }}>Reflection</SectionLabel>
-        </AnimatedLine>
-
-        <AnimatedLine delay={0.1}>
-          <h2 style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: "clamp(22px, 3.5vw, 36px)",
-            marginBottom: 64,
-            color: "rgba(255,255,255,0.6)",
-          }}>
-            The Pattern is Clear
-          </h2>
-        </AnimatedLine>
-
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          marginBottom: 64,
-        }}>
-          {REFLECTION_LINES.map((line, i) => (
-            <AnimatedLine key={i} delay={0.15 * i}>
-              <div style={{
-                fontFamily: "'Space Mono', monospace",
-                fontSize: "clamp(28px, 6vw, 64px)",
-                fontWeight: 700,
-                lineHeight: 1.1,
-                color: i % 2 === 0 ? "white" : "rgba(255,60,60,0.7)",
-                letterSpacing: "-0.02em",
-              }}>
-                {line}
-              </div>
-            </AnimatedLine>
-          ))}
-        </div>
-
-        <AnimatedLine delay={0.6}>
-          <div style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "clamp(14px, 2vw, 18px)",
-            color: "rgba(255,255,255,0.35)",
-            lineHeight: 1.7,
-            maxWidth: 480,
-            margin: "0 auto",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
-            paddingTop: 32,
-          }}>
-            And we wonder why nothing reaches billions.
-          </div>
-        </AnimatedLine>
-      </section>
-
-      {/* ─── SOLUTION ─── */}
-      <section style={{
-        background: "rgba(0,255,128,0.025)",
-        borderTop: "1px solid rgba(0,255,128,0.1)",
-        borderBottom: "1px solid rgba(0,255,128,0.1)",
-      }}>
-        <div style={{
-          maxWidth: 860,
-          margin: "0 auto",
-          padding: "120px 24px",
-          textAlign: "center",
-        }}>
-          <AnimatedLine>
-            <SectionLabel>Change</SectionLabel>
-          </AnimatedLine>
-
-          <AnimatedLine delay={0.1}>
+        <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 20px" }}>
+          <Reveal><Label>The Pattern</Label></Reveal>
+          <Reveal delay={0.08}>
             <h2 style={{
-              fontFamily: "'Space Mono', monospace",
-              fontSize: "clamp(22px, 3.5vw, 36px)",
-              marginBottom: 64,
-              color: "#00ff80",
+              fontFamily: "'Space Mono', monospace", fontWeight: 700,
+              fontSize: "clamp(22px, 5.5vw, 40px)", lineHeight: 1.15, marginBottom: 4,
             }}>
-              Break the Cycle
+              Four problems.
             </h2>
-          </AnimatedLine>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <h2 style={{
+              fontFamily: "'Space Mono', monospace", fontWeight: 700,
+              fontSize: "clamp(22px, 5.5vw, 40px)", lineHeight: 1.15, marginBottom: 10,
+              color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.25)",
+            }}>
+              All self-inflicted.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.22}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "clamp(13px, 3.5vw, 15px)",
+              color: "rgba(255,255,255,0.3)", marginBottom: 48, lineHeight: 1.7,
+            }}>
+              Not the market. Not the devs. Us.
+            </p>
+          </Reveal>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 2,
-            maxWidth: 560,
-            margin: "0 auto 64px",
-          }}>
-            {SOLUTION_LINES.map((line, i) => (
-              <AnimatedLine key={i} delay={0.1 * i}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {CARDS.map((card, i) => <Card key={card.id} card={card} index={i} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ THIN DIVIDER ══════════════════════════════════════════ */}
+      <div style={{
+        position: "relative", zIndex: 1,
+        width: "100%", height: 1,
+        background: "rgba(255,255,255,0.06)",
+      }} />
+
+      {/* ══ REFLECTION ════════════════════════════════════════════ */}
+      <section style={{
+        position: "relative", zIndex: 1,
+        width: "100%", padding: "100px 0", overflow: "hidden",
+      }}>
+        {/* Ghost bg word */}
+        <div style={{
+          position: "absolute", left: "50%", top: "50%",
+          transform: "translate(-50%, -50%)",
+          fontFamily: "'Space Mono', monospace", fontWeight: 700,
+          fontSize: "clamp(80px, 22vw, 200px)",
+          color: "transparent",
+          WebkitTextStroke: "1px rgba(255,255,255,0.025)",
+          whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none",
+          letterSpacing: "-0.03em",
+        }}>
+          WE
+        </div>
+
+        <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 20px", textAlign: "center" }}>
+          <Reveal><Label>Reflection</Label></Reveal>
+          <Reveal delay={0.1}>
+            <h2 style={{
+              fontFamily: "'Space Mono', monospace", fontWeight: 700,
+              fontSize: "clamp(18px, 4vw, 30px)",
+              color: "rgba(255,255,255,0.45)", marginBottom: 52,
+            }}>
+              The Pattern is Clear
+            </h2>
+          </Reveal>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {REFLECTION_LINES.map((line, i) => (
+              <Reveal key={i} delay={i * 0.12}>
                 <div style={{
-                  background: "rgba(0,255,128,0.04)",
-                  border: "1px solid rgba(0,255,128,0.12)",
-                  padding: "32px 24px",
-                  fontFamily: "'Space Mono', monospace",
-                  fontSize: "clamp(14px, 2vw, 18px)",
-                  color: "#00ff80",
-                  letterSpacing: "0.04em",
+                  fontFamily: "'Space Mono', monospace", fontWeight: 700,
+                  fontSize: "clamp(28px, 8.5vw, 76px)", lineHeight: 1.08,
+                  letterSpacing: "-0.025em",
+                  color: i % 2 === 0 ? "rgba(255,255,255,0.9)" : "rgba(255,60,60,0.62)",
                 }}>
                   {line}
                 </div>
-              </AnimatedLine>
+              </Reveal>
             ))}
           </div>
 
-          <AnimatedLine delay={0.5}>
+          <Reveal delay={0.62}>
             <div style={{
+              marginTop: 48, paddingTop: 30,
+              borderTop: "1px solid rgba(255,255,255,0.07)",
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: 15,
-              color: "rgba(255,255,255,0.3)",
-              letterSpacing: "0.06em",
+              fontSize: "clamp(13px, 3.5vw, 15px)",
+              color: "rgba(255,255,255,0.28)", lineHeight: 1.75,
             }}>
-              One decision compounds. Every time.
+              And we wonder why nothing reaches billions.
             </div>
-          </AnimatedLine>
+          </Reveal>
         </div>
       </section>
 
-      {/* ─── COIN ─── */}
+      {/* ══ SOLUTION ══════════════════════════════════════════════ */}
       <section style={{
-        maxWidth: 860,
-        margin: "0 auto",
-        padding: "120px 24px",
-        textAlign: "center",
+        position: "relative", zIndex: 1, width: "100%",
+        padding: "100px 0",
+        borderTop: "1px solid rgba(0,255,128,0.07)",
+        borderBottom: "1px solid rgba(0,255,128,0.07)",
+        background: "rgba(0,255,128,0.016)",
       }}>
-        <AnimatedLine>
-          <SectionLabel>The Token</SectionLabel>
-        </AnimatedLine>
+        <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 20px" }}>
+          <Reveal><Label>Change</Label></Reveal>
+          <Reveal delay={0.1}>
+            <h2 style={{
+              fontFamily: "'Space Mono', monospace", fontWeight: 700,
+              fontSize: "clamp(22px, 5.5vw, 40px)", color: "#00ff80", marginBottom: 48,
+            }}>
+              Break the Cycle
+            </h2>
+          </Reveal>
 
-        {/* Coin visual */}
-        <AnimatedLine delay={0.1}>
           <div style={{
-            width: 80,
-            height: 80,
-            borderRadius: "50%",
-            border: "2px solid rgba(0,255,128,0.4)",
-            margin: "0 auto 32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 0 40px rgba(0,255,128,0.08), inset 0 0 30px rgba(0,255,128,0.04)",
-            position: "relative",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 2,
           }}>
+            {SOLUTION_LINES.map((item, i) => (
+              <Reveal key={i} delay={i * 0.09}>
+                <div style={{
+                  background: "rgba(0,255,128,0.03)",
+                  border: "1px solid rgba(0,255,128,0.09)",
+                  padding: "26px 22px",
+                }}>
+                  <div style={{
+                    fontFamily: "'Space Mono', monospace", fontWeight: 700,
+                    fontSize: "clamp(15px, 4vw, 19px)", color: "#00ff80",
+                    marginBottom: 8,
+                  }}>
+                    {item.text}
+                  </div>
+                  <div style={{
+                    fontFamily: "'DM Sans', sans-serif", fontSize: 11,
+                    color: "rgba(255,255,255,0.28)", letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}>
+                    {item.sub}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={0.45}>
             <div style={{
-              width: 60,
-              height: 60,
-              borderRadius: "50%",
-              border: "1px solid rgba(0,255,128,0.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "'Space Mono', monospace",
-              fontSize: 20,
+              marginTop: 36,
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "clamp(12px, 3vw, 13px)",
+              color: "rgba(255,255,255,0.2)", letterSpacing: "0.07em",
             }}>
-              ∞
+              One decision compounds. Every time.
             </div>
-          </div>
-        </AnimatedLine>
-
-        <AnimatedLine delay={0.2}>
-          <h2 style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: "clamp(20px, 3vw, 32px)",
-            fontWeight: 700,
-            marginBottom: 16,
-            letterSpacing: "0.02em",
-          }}>
-            Tragedy of the Commons
-          </h2>
-        </AnimatedLine>
-
-        <AnimatedLine delay={0.3}>
-          <p style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: 15,
-            color: "rgba(255,255,255,0.4)",
-            lineHeight: 1.75,
-            maxWidth: 420,
-            margin: "0 auto 48px",
-          }}>
-            A memecoin built on awareness.<br />
-            A reminder that change starts with behavior.
-          </p>
-        </AnimatedLine>
-
-        {/* Contract address */}
-        <AnimatedLine delay={0.4}>
-          <div style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 2,
-            padding: "14px 24px",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 12,
-            marginBottom: 32,
-            maxWidth: "100%",
-          }}>
-            <span style={{
-              fontFamily: "'Space Mono', monospace",
-              fontSize: 9,
-              letterSpacing: "0.2em",
-              color: "rgba(255,255,255,0.3)",
-              textTransform: "uppercase",
-              minWidth: "fit-content",
-            }}>
-              CA
-            </span>
-            <span
-              className="coin-address"
-              style={{
-                fontFamily: "'Space Mono', monospace",
-                fontSize: 12,
-                color: "rgba(255,255,255,0.5)",
-                letterSpacing: "0.05em",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Coming Soon · TBD
-            </span>
-          </div>
-        </AnimatedLine>
-
-        {/* CTA buttons */}
-        <AnimatedLine delay={0.5}>
-          <div style={{
-            display: "flex",
-            gap: 12,
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}>
-            <button className="cta-btn">
-              Buy
-            </button>
-            <button className="ghost-btn">
-              Chart
-            </button>
-            <button className="ghost-btn">
-              Community
-            </button>
-          </div>
-        </AnimatedLine>
+          </Reveal>
+        </div>
       </section>
 
-      {/* ─── FOOTER ─── */}
-      <footer style={{
-        borderTop: "1px solid rgba(255,255,255,0.05)",
-        padding: "40px 24px",
-        textAlign: "center",
+      {/* ══ COIN ══════════════════════════════════════════════════ */}
+      <section style={{
+        position: "relative", zIndex: 1, width: "100%",
+        padding: "100px 0",
       }}>
         <div style={{
-          maxWidth: 860,
-          margin: "0 auto",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 16,
+          maxWidth: 700, margin: "0 auto",
+          padding: "0 20px", textAlign: "center",
+        }}>
+          <Reveal><Label>The Token</Label></Reveal>
+
+          <Reveal delay={0.08}>
+            <div style={{
+              width: 70, height: 70, borderRadius: "50%",
+              border: "1.5px solid rgba(0,255,128,0.32)",
+              margin: "0 auto 26px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 0 40px rgba(0,255,128,0.06), inset 0 0 20px rgba(0,255,128,0.03)",
+            }}>
+              <div style={{
+                fontFamily: "'Space Mono', monospace", fontSize: 22,
+                color: "rgba(0,255,128,0.65)", lineHeight: 1,
+              }}>∞</div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.15}>
+            <h2 style={{
+              fontFamily: "'Space Mono', monospace", fontWeight: 700,
+              fontSize: "clamp(17px, 4vw, 24px)", letterSpacing: "0.03em",
+              marginBottom: 14,
+            }}>
+              Tragedy of the Commons
+            </h2>
+          </Reveal>
+
+          <Reveal delay={0.22}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "clamp(13px, 3.5vw, 15px)",
+              color: "rgba(255,255,255,0.32)", lineHeight: 1.8,
+              maxWidth: 360, margin: "0 auto 42px",
+            }}>
+              A memecoin built on awareness.<br />
+              A reminder that change starts with behavior.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.3}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 14,
+              background: "rgba(255,255,255,0.022)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              padding: "13px 20px", marginBottom: 26,
+              maxWidth: "100%", overflow: "hidden",
+            }}>
+              <span style={{
+                fontFamily: "'Space Mono', monospace", fontSize: 9,
+                letterSpacing: "0.22em", textTransform: "uppercase",
+                color: "rgba(255,255,255,0.22)", whiteSpace: "nowrap",
+              }}>CA</span>
+              <span style={{
+                fontFamily: "'Space Mono', monospace", fontSize: 11,
+                color: "rgba(255,255,255,0.38)", letterSpacing: "0.04em",
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              }}>
+                Coming Soon · TBD
+              </span>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.38}>
+            <div style={{
+              display: "flex", gap: 10,
+              justifyContent: "center", flexWrap: "wrap",
+            }}>
+              <button className="btn-primary">Buy</button>
+              <button className="btn-ghost">Chart</button>
+              <button className="btn-ghost">Community</button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ══ FOOTER ════════════════════════════════════════════════ */}
+      <footer style={{
+        position: "relative", zIndex: 1, width: "100%",
+        borderTop: "1px solid rgba(255,255,255,0.05)",
+        padding: "30px 20px",
+      }}>
+        <div style={{
+          maxWidth: 700, margin: "0 auto",
+          display: "flex", justifyContent: "space-between",
+          alignItems: "center", flexWrap: "wrap", gap: 10,
         }}>
           <div style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: 10,
-            letterSpacing: "0.15em",
-            color: "rgba(255,255,255,0.2)",
-            textTransform: "uppercase",
+            fontFamily: "'Space Mono', monospace", fontSize: 9,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            color: "rgba(255,255,255,0.16)",
           }}>
             Tragedy of the Commons · Solana
           </div>
           <div style={{
-            fontFamily: "'Space Mono', monospace",
-            fontSize: 10,
-            letterSpacing: "0.1em",
-            color: "rgba(255,255,255,0.15)",
+            fontFamily: "'Space Mono', monospace", fontSize: 9,
+            letterSpacing: "0.1em", color: "rgba(255,255,255,0.1)",
           }}>
             Not financial advice. This is a mirror.
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 }
